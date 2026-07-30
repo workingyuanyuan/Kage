@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<!-- 影 · kage 官網。由 scripts/build-site.mjs 生成，不要手改。
+     BASE 區塊與模板逐字共用，由 kage sync 校驗。 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kage — Physical Optics & Document Generation System</title>
+<meta name="description" content="Mapping requirements into 16 templates and 45 color tokens to generate physical on-screen HTML documents.">
+<meta name="author" content="workingyuanyuan">
+<meta name="generator" content="kage">
+<link rel="canonical" href="https://example.com/kage/index-en-develop.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="kage — Physical Optics & Document Generation System">
+<meta property="og:description" content="Mapping requirements into 16 templates and 45 color tokens to generate physical on-screen HTML documents.">
+<meta property="og:image" content="../assets/demos/demo-archive-proposal-en-1280.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/fonts/noto-serif-tc/noto-serif-tc.css">
+<style>
+/* ===== BASE BEGIN — 全部模板逐字共用，不得單獨修改 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* 色彩 — 與 references/tokens.json 逐字一致 */
+  --color-accent-primary:         #a95d35;
+  --color-accent-secondary:       #b55829;
+  --color-accent-hover:           #db6f39;
+  --color-accent-pressed:         #7c4120;
+
+  --color-background-base:        #000000;   /* 實際繪製色 */
+  --color-background-global:      #0d0d0d;   /* 疊顆粒後的目標值，不可直接當底色 */
+  --color-background-field-warm:  #0f0f0f;
+  --color-background-field-cool:  #0c0e0f;
+  --color-background-deep:        #050505;
+  --color-background-overlay:     rgb(9 9 9 / 52%);
+
+  --color-leak-1:                 #1a1210;
+  --color-leak-2:                 #26170f;
+  --color-leak-3:                 #331c0f;
+  --color-leak-4:                 #432513;
+  --color-leak-core:              #683e1d;
+  --color-leak-source:            rgb(255 114 29 / 24%);
+
+  --color-tint-cool:              #111516;
+
+  --color-grain:                  rgb(128 128 128 / 10%);
+  --color-dust:                   #424242;
+  --color-scratch:                #56524d;
+  --color-hairline:               rgb(238 228 213 / 11%);
+
+  --color-surface-dark:           #29241e;
+  --color-surface-dark-secondary: #40362c;
+  --color-paper-surface:          #e8dfcf;
+  --color-paper-light:            #f0e8da;
+  --color-paper-letter:           #d8c8aa;
+
+  --color-text-on-dark:           #eee4d5;
+  --color-text-muted-on-dark:     #bba893;
+  --color-text-on-light:          #29241e;
+  --color-text-muted-on-light:    #6f6559;
+
+  --color-text-accent:            #a95d35;
+  --color-text-accent-hover:      #db6f39;
+  --color-text-emphasis:          #7c4120;
+  --color-text-on-accent:         #f0e8da;
+
+  --color-border-accent:          #a95d35;
+  --color-border-on-dark:         rgb(238 228 213 / 32%);
+  --color-border-on-light:        rgb(124 65 32 / 28%);
+
+  --color-link:                   #a95d35;
+  --color-link-hover:             #db6f39;
+  --color-focus-ring:             #db6f39;
+  --color-icon-accent:            #b55829;
+
+  --color-state-success:          #6b7350;
+  --color-state-warning:          #9a7433;
+  --color-state-error:            #9c4a3c;
+  --color-state-info:             #5c6b78;
+
+  /* 間距 */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px;  --space-6: 32px;  --space-8: 48px;  --space-10: 64px;
+  --space-12: 96px; --space-16: 128px;
+
+  /* 字體 */
+  --serif: "Noto Serif TC", "Source Han Serif TC", "Source Han Serif TW",
+           "Songti TC", "PMingLiU", Georgia, serif;
+  --sans:  "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --mono:  ui-monospace, "SF Mono", Consolas, monospace;
+
+  --container: 1200px;
+  --measure:   38em;        /* 正文行寬上限，約 646px */
+
+  /* 漏光光源的 RGB 通道。--color-leak-source 已把 alpha 烘進去，
+     而漏光強度需隨頁型變動，故另存通道三元組供 rgb() 組裝。 */
+  --leak-rgb: 255 114 29;
+
+  /* 漏光強度預設 A 敘事型，由頁型 class 覆寫 */
+  --leak-a: 24%;
+  --leak-b: 19%;
+}
+.tier-structural { --leak-a: 15%; --leak-b: 12%; }
+.tier-reading    { --leak-a: 10%; --leak-b:  8%; }
+
+html { background-color: var(--color-background-base); }
+body {
+  font-family: var(--serif); font-size: 16px; line-height: 1.85;
+  color: var(--color-text-on-dark);
+  -webkit-font-smoothing: antialiased;
+}
+:lang(en) { line-height: 1.70; }
+
+/* ── 背景四層：繪製基色 + 暖色漏光 + 顆粒，全部錨定視窗 ──
+   基色與漏光必須在同一元素的 background stack，background-blend-mode 才生效。
+   漸層水平半徑用 vw 不能用 %（% 無法與長度混入 min()，整條 background-image
+   會靜默退回 none）；垂直半徑維持 % 以對應 visual viewport。            */
+.bg-fixed {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-color: var(--color-background-base);
+  background-image:
+    radial-gradient(ellipse min(55vw, 900px) 90% at 104% 50%,
+                    rgb(var(--leak-rgb) / var(--leak-a)) 0%, rgb(var(--leak-rgb) / 0%) 100%),
+    radial-gradient(ellipse min(45vw, 760px) 70% at -6% 88%,
+                    rgb(var(--leak-rgb) / var(--leak-b)) 0%, rgb(var(--leak-rgb) / 0%) 100%);
+  background-blend-mode: screen;
+}
+.bg-fixed::after {
+  content: ""; position: absolute; inset: 0;
+  opacity: .10;
+  background-image: url("../assets/img/grain-200.png");
+  background-size: 200px 200px;
+  /* 顆粒為靜態材質，不得加入閃爍、位移或任何動畫 */
+}
+main { position: relative; z-index: 1; }
+
+/* ── 局部表面：只有顆粒，不套漏光與中央沉暗構圖 ── */
+.surf { position: relative; }
+.surf > * { position: relative; z-index: 2; }
+.surf::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: .10;
+  background-image: url("../assets/img/grain-200.png");
+  background-size: 200px 200px;
+}
+.surf--card   { background-color: var(--color-surface-dark); }
+.surf--sub    { background-color: var(--color-surface-dark-secondary); }
+.surf--paper  { background-color: var(--color-paper-surface);  color: var(--color-text-on-light); }
+.surf--light  { background-color: var(--color-paper-light);    color: var(--color-text-on-light); }
+.surf--letter { background-color: var(--color-paper-letter);   color: var(--color-text-on-light); }
+.surf--paper::after, .surf--light::after, .surf--letter::after {
+  opacity: .055; mix-blend-mode: multiply;   /* 紙張要讀成纖維而非反光 */
+}
+
+/* ── 排印 ── */
+.t-display { font-size: 64px; font-weight: 600; line-height: 1.10; letter-spacing: .04em; }
+.t-h1      { font-size: 44px; font-weight: 600; line-height: 1.16; letter-spacing: .04em; }
+.t-h2      { font-size: 30px; font-weight: 600; line-height: 1.25; letter-spacing: .03em; }
+.t-h3      { font-size: 22px; font-weight: 600; line-height: 1.35; letter-spacing: .02em; }
+.t-lead    { font-size: 18px; line-height: 1.80; }
+.t-small   { font-size: 14px; line-height: 1.70; }
+.t-caption { font-size: 13px; line-height: 1.65; letter-spacing: .04em; }
+.t-label   { font-family: var(--sans); font-size: 11px; line-height: 1.60;
+             letter-spacing: .28em; text-transform: uppercase; }
+.t-meta    { font-family: var(--sans); font-size: 11px; line-height: 1.60; letter-spacing: .28em; }
+.t-muted   { color: var(--color-text-muted-on-dark); }
+.t-accent  { color: var(--color-text-accent); }
+.t-num     { font-variant-numeric: tabular-nums; }
+
+/* 正文欄：C 級必須置中且不超過 --measure，否則會落進邊緣漸亮區 */
+.measure   { max-width: var(--measure); }
+.tier-reading .measure { margin-inline: auto; }
+:lang(en) .measure { max-width: 60ch; }
+
+/* ── 印刷裝飾：真實元素，純裝飾帶 aria-hidden ── */
+.decor-rule    { height: 1px; background: var(--color-border-on-dark); }
+.decor-dash    { width: 24px; height: 2px; background: var(--color-accent-secondary); }
+.decor-num     { font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+                 color: var(--color-text-muted-on-dark); }
+.decor-corner  { position: absolute; width: 10px; height: 10px;
+                 border-top: 1px solid var(--color-border-on-dark);
+                 border-left: 1px solid var(--color-border-on-dark); }
+.decor-dust    { position: absolute; width: 2px; height: 2px; border-radius: 50%;
+                 background: var(--color-dust); }
+.decor-scratch { position: absolute; width: 1px; opacity: .55;
+                 background: var(--color-scratch); }
+
+/* 幾何細線與弧線：大半徑圓弧，不裁切、直接穿出畫面外。
+   整圈 1px 橢圓只有一小段落在畫面內，讀成一道構圖弧而不是一個圓。 */
+/* fixed 而非 absolute：無定位祖先時 absolute 會落在初始包含塊上，
+   長頁面捲動後裝飾就離開畫面了。這些和顆粒同屬背景材質，一律錨定視窗。 */
+.decor-arc     { position: fixed; pointer-events: none; z-index: 0;
+                 border: 1px solid var(--color-hairline); border-radius: 50%; }
+.decor-arc--a  { width: 120vw; height: 120vw; left: -14vw; top: -64vw; }
+.decor-arc--b  { width:  86vw; height:  86vw; right: -30vw; bottom: -46vw; }
+
+/* 塵點：位置寫死不隨機 —— 隨機會讓每次重載的分布不同，而磨損是靜態材質。
+   面積 12 個 2px 塵點共 48px²，遠低於 1280×800 的 1000px² 預算。
+
+   **不與弧線同時出現斷續刮痕。** 弧線是構圖語彙、刮痕是損傷語彙，兩者的
+   觀感不同，疊在一起會互相抵銷。用了弧線就只配塵點。
+
+   不壓透明度，塵點就是規格寫的 --color-dust。合成 luma 66 略高於天花板
+   標題那個 65，但第 3 條驗收判的是三條面積帶，12 個 2px 塵點共 48px²
+   對任何一帶都無足輕重。刮痕才需要 .55（luma 82.5），那寫在 .decor-scratch。 */
+.decor-grit    { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.decor-grit::before {
+                 content: ""; position: absolute; left: 9%; top: 22%;
+                 width: 2px; height: 2px; border-radius: 50%; background: var(--color-dust);
+                 box-shadow:
+                   14vw  9vh var(--color-dust),  31vw 27vh var(--color-dust),
+                   47vw  4vh var(--color-dust),  56vw 41vh var(--color-dust),
+                   63vw 15vh var(--color-dust),  72vw 33vh var(--color-dust),
+                   19vw 46vh var(--color-dust),  38vw 58vh var(--color-dust),
+                   58vw 66vh var(--color-dust),  77vw 55vh var(--color-dust),
+                   84vw 24vh var(--color-dust),  27vw 71vh var(--color-dust); }
+
+/* 鏡像重影：既有英文小標的處理手法，不新增內容 ——
+   data-ghost 必須與元素本身的文字相同，lint 會檢查兩者是否一致。 */
+.ghost         { position: relative; }
+.ghost::after  { content: attr(data-ghost); position: absolute; left: 0; top: 100%;
+                 transform: scaleY(-1); opacity: .14; pointer-events: none;
+                 -webkit-mask-image: linear-gradient(to bottom, #000, transparent 68%);
+                         mask-image: linear-gradient(to bottom, #000, transparent 68%); }
+
+/* 邊緣編目微型字：屬材質而非資訊，內容取自頁面既有中繼資料，不得杜撰。 */
+.edge-code     { position: fixed; right: var(--space-4); top: 50%; z-index: 0;
+                 transform: translateY(-50%) rotate(90deg); transform-origin: right center;
+                 font-family: var(--sans); font-size: 9px; letter-spacing: .5em;
+                 text-transform: uppercase; pointer-events: none;
+                 color: var(--color-text-muted-on-dark); opacity: .16; }
+
+/* ── 按鈕 ── */
+.btn { display: inline-flex; align-items: center; gap: var(--space-2);
+       padding: 12px 26px; border-radius: 1px; cursor: pointer; text-decoration: none;
+       font-family: var(--sans); font-size: 12px; font-weight: 600;
+       letter-spacing: .16em; text-transform: uppercase;
+       transition: background-color 150ms cubic-bezier(.2,0,0,1),
+                   color 150ms cubic-bezier(.2,0,0,1),
+                   border-color 150ms cubic-bezier(.2,0,0,1),
+                   transform 150ms cubic-bezier(.2,0,0,1); }
+.btn-primary   { background: var(--color-accent-primary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-cta       { background: var(--color-accent-secondary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-secondary { background: transparent; color: var(--color-text-on-dark);
+                 border: 1px solid var(--color-border-accent); }
+/* 標籤走米白而非橘棕：12px 橘棕在邊緣漏光區只有 2.85:1。
+   可操作性由橘棕邊框承擔，仍符合「透明背景 + 細邊框」。 */
+.btn-en        { font-size: 10px; letter-spacing: .24em; opacity: .72; }
+.btn:hover     { transform: translateY(-1px); }
+.btn:active    { transform: translateY(1px); }
+.btn-primary:hover    { background: var(--color-accent-hover); }
+.btn-primary:active   { background: var(--color-accent-pressed); }
+.btn-secondary:hover  { color: var(--color-text-accent-hover);
+                        border-color: var(--color-accent-hover); }
+/* 深色背景上的 Active 不落到 --color-accent-pressed（明度不足） */
+.btn-secondary:active { background: var(--color-accent-primary);
+                        color: var(--color-text-on-accent);
+                        border-color: var(--color-accent-primary); }
+.btn:disabled  { opacity: .4; cursor: not-allowed; pointer-events: none; transform: none; }
+
+.link { color: var(--color-link); text-decoration: none; }
+.link:hover { color: var(--color-link-hover); text-decoration: underline;
+              text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+/* ── 面板與表格 ── */
+.panel      { background: var(--color-surface-dark); padding: var(--space-6);
+              border: 1px solid var(--color-border-on-dark);
+              box-shadow: 0 1px 0 rgb(0 0 0 / 18%); }
+.panel-line { height: 1px; margin: var(--space-4) 0; background: var(--color-border-on-dark); }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table      { width: 100%; border-collapse: collapse;
+              border-top: 2px solid var(--color-border-accent); }
+.table th, .table td { padding: 12px 8px;
+              border-bottom: 1px solid var(--color-border-on-dark); }
+.table th   { text-align: left; font-weight: 400; font-family: var(--sans);
+              font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+              color: var(--color-text-muted-on-dark); }
+.table td   { font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* ── 引用與提示 ── */
+.quote     { display: flex; gap: var(--space-4); margin: 0; padding: 20px 24px;
+             border: 1px solid var(--color-border-on-light); }
+.quote-bar { flex-shrink: 0; width: 3px; background: var(--color-accent-primary); }
+.quote p   { margin: 0; font-size: 16px; line-height: 1.7; }
+.quote cite{ display: block; margin-top: var(--space-2); font-style: normal;
+             font-size: 13px; color: var(--color-text-muted-on-light); }
+.callout   { padding: var(--space-5); border-left: 3px solid var(--color-state-info); }
+.msg       { display: flex; align-items: center; gap: var(--space-2); font-size: 13px; }
+.msg--error   { color: var(--color-state-error); }
+.msg--warning { color: var(--color-state-warning); }
+.msg--success { color: var(--color-state-success); }
+.msg--info    { color: var(--color-state-info); }
+
+/* ── 圖片框架 ── */
+.plate      { margin: 0; padding: 12px; }
+.plate-wrap { position: relative; overflow: hidden; }
+.plate-wrap img { display: block; width: 100%; height: auto; }
+.plate-mask { position: absolute; inset: 0; pointer-events: none;
+              background: var(--color-background-overlay); }
+.plate figcaption { display: flex; gap: var(--space-2); margin-top: var(--space-2);
+                    font-size: 12px; }
+.plate-num  { font-family: var(--mono); font-weight: 600; color: var(--color-text-emphasis); }
+
+/* ── 焦點與高對比 ── */
+:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
+@media (forced-colors: active) {
+  .btn, .panel, .table, .nav-item,
+  .field input, .field select, .field textarea, .check, .radio { border: 1px solid ButtonText; }
+  .bg-fixed, .surf::after { display: none; }
+  :focus-visible { outline: 2px solid Highlight; }
+}
+
+/* ── 窄螢幕：漏光半徑與正文欄同為視窗寬度的比例，等比縮放後
+      內容佔比反而變大而伸進漏光。降階以維持正文欄的暗區條件。
+      顆粒強度不隨斷點改變。 ── */
+@media (max-width: 1023px) {
+  .tier-reading    { --leak-a: 6%; --leak-b: 5%; }
+  .tier-structural { --leak-a: 9%; --leak-b: 7%; }
+}
+
+/* ── 高對比偏好：可弱化漏光，但顆粒必須保留 ── */
+@media (prefers-contrast: more) {
+  .tier-reading { --leak-a: 5%; --leak-b: 4%; }
+}
+
+/* ── 列印：停用深色背景與顆粒，改用淺色紙張 ── */
+@media print {
+  .bg-fixed { display: none; }
+  .surf::after { display: none; }
+  html, body { background: #fff; color: #000; }
+  .panel, .table { border-color: #999; }
+}
+
+/* ── 動效降級 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* 只靠 clip-path／transform 的動效沒有 opacity 起始態，
+     限制 transition-property 之後會直接彈出。補一組淡入。 */
+  .anim-reveal { opacity: 0; clip-path: none !important; }
+  .anim-reveal.is-active { opacity: 1; }
+}
+/* ===== BASE END ===== */
+
+/* ── 官網專屬版面。BASE 之外，不影響模板。 ── */
+.site-wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--space-6); }
+.nav { position: sticky; top: 0; z-index: 3; display: flex; align-items: baseline;
+       gap: var(--space-6); padding: var(--space-5) 0;
+       border-bottom: 1px solid var(--color-border-on-dark); }
+.nav-mark { font-family: var(--serif); font-size: 19px; font-weight: 600; letter-spacing: .12em; }
+.nav-links { margin-left: auto; display: flex; gap: var(--space-5); }
+.nav-link { font-family: var(--sans); font-size: 11px; letter-spacing: .28em;
+            text-transform: uppercase; text-decoration: none;
+            color: var(--color-text-muted-on-dark); padding-bottom: 3px;
+            border-bottom: 1px solid transparent; transition: color 150ms cubic-bezier(.2,0,0,1); }
+.nav-link:hover { color: var(--color-text-on-dark); border-bottom-color: var(--color-border-accent); }
+.nav-link[aria-current="true"] { color: var(--color-text-accent); border-bottom-color: var(--color-border-accent); }
+
+.hero { padding: var(--space-16) 0 var(--space-12); }
+.hero-aphorism { font-family: var(--serif); font-size: clamp(38px, 5.4vw, 62px); font-weight: 600;
+                 line-height: 1.18; letter-spacing: .04em; max-width: 22em; }
+.hero-lede { margin-top: var(--space-6); max-width: var(--measure); font-size: 18px; line-height: 1.80;
+             color: var(--color-text-muted-on-dark); }
+/* 規格帶直接接在導言下方，不加分隔線 —— 多一條線會把首屏切成兩塊空區。
+   它是導言的延伸（同一件事的具體數值），不是另一個區段。 */
+.spec-strip { margin-top: var(--space-6); display: flex; flex-wrap: wrap;
+              gap: var(--space-5) var(--space-6); }
+.spec-strip div { font-family: var(--sans); font-size: 11px; letter-spacing: .2em; }
+.spec-strip b { display: block; font-family: var(--mono); font-weight: 400; font-size: 12px;
+                letter-spacing: .1em; color: var(--color-text-on-dark); margin-top: 4px; }
+.spec-strip span { color: var(--color-text-muted-on-dark); text-transform: uppercase; }
+
+.sec { padding: var(--space-12) 0; border-top: 1px solid var(--color-border-on-dark); }
+.sec-num { font-family: var(--mono); font-size: 11px; letter-spacing: .22em;
+           color: var(--color-text-accent); }
+.sec-title { margin-top: var(--space-3); font-size: 30px; font-weight: 600; letter-spacing: .03em; }
+.sec-lede { margin-top: var(--space-4); max-width: var(--measure); color: var(--color-text-muted-on-dark); }
+.sec-body { margin-top: var(--space-8); }
+
+.g2 { display: grid; grid-template-columns: 1.618fr 1fr; gap: var(--space-8); }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+@media (max-width: 900px) { .g2, .g3 { grid-template-columns: 1fr; } }
+
+/* 展示：示範文件縮圖 */
+.shot { margin: 0; }
+.shot a { display: block; text-decoration: none; }
+.shot img { display: block; width: 100%; height: auto;
+            border: 1px solid var(--color-border-on-dark); }
+.shot figcaption { margin-top: var(--space-3); font-size: 13px; letter-spacing: .02em; }
+.shot .kind { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: .28em;
+              text-transform: uppercase; color: var(--color-text-muted-on-dark); margin-bottom: 4px; }
+
+/* 色票 */
+.sw-group { margin-bottom: var(--space-8); }
+.sw-en { margin-left: var(--space-3); color: var(--color-text-muted-on-dark); }
+.sw-row { margin-top: var(--space-4); display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: var(--space-4); }
+.sw { margin: 0; }
+.sw-chip { height: 72px; border: 1px solid var(--color-border-on-dark); }
+.sw figcaption { margin-top: var(--space-2); display: flex; flex-direction: column; gap: 2px; }
+.sw-hex { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; }
+.sw-note { font-size: 12px; color: var(--color-text-muted-on-dark); line-height: 1.5; }
+.sw-luma { font-size: 10px; }
+
+/* 排印階梯 */
+.ty-row { display: grid; grid-template-columns: 132px 1fr 92px; gap: var(--space-5);
+          align-items: baseline; padding: var(--space-4) 0;
+          border-bottom: 1px solid rgb(238 228 213 / 10%); }
+.ty-sample { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 900px) { .ty-row { grid-template-columns: 1fr; } }
+
+/* 母題展示台 */
+.mo { margin: 0; }
+.mo-stage { position: relative; height: 168px; overflow: hidden;
+            border: 1px solid var(--color-border-on-dark);
+            background-color: var(--color-background-base); }
+.mo-stage::after { content: ""; position: absolute; inset: 0; opacity: .10;
+                   background-image: url("../assets/img/grain-200.png"); background-size: 200px 200px; }
+.mo-arc { position: absolute; width: 420px; height: 420px; left: -90px; top: 64px;
+          border: 1px solid var(--color-hairline); border-radius: 50%; }
+.mo-grit { position: absolute; left: 22%; top: 28%; width: 2px; height: 2px; border-radius: 50%;
+           background: var(--color-dust);
+           box-shadow: 44px 22px var(--color-dust), 96px 61px var(--color-dust),
+                       152px 18px var(--color-dust), 187px 88px var(--color-dust),
+                       61px 104px var(--color-dust), 132px 126px var(--color-dust); }
+.mo-stage .ghost { position: absolute; left: var(--space-5); top: 58px; }
+.mo-edge { position: absolute; right: -22px; top: 50%; transform: translateY(-50%) rotate(90deg);
+           font-size: 9px; letter-spacing: .5em; opacity: .3; }
+.mo figcaption { margin-top: var(--space-3); font-size: 13px; }
+.mo-note { display: block; margin-top: 4px; color: var(--color-text-muted-on-dark);
+           font-size: 12px; line-height: 1.55; }
+
+/* 元件展示 */
+.cp { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+.cp-panel { padding: var(--space-5); }
+.cp-panel dt { font-family: var(--sans); font-size: 10px; letter-spacing: .28em;
+               text-transform: uppercase; color: var(--color-text-muted-on-dark); }
+.cp-panel dd { margin: 4px 0 var(--space-4); }
+
+/* 驗收清單 */
+.chk { list-style: none; }
+.chk li { display: grid; grid-template-columns: 26px 1fr; gap: var(--space-3);
+          padding: var(--space-3) 0; border-bottom: 1px solid rgb(238 228 213 / 10%); }
+.chk .n { font-family: var(--mono); font-size: 11px; color: var(--color-text-accent); }
+.chk b { font-weight: 600; }
+.chk span { display: block; margin-top: 3px; font-size: 13px;
+            color: var(--color-text-muted-on-dark); line-height: 1.6; }
+
+/* 問答 */
+.qa { max-width: var(--measure); }
+.qa dt { margin-top: var(--space-6); font-weight: 600; font-size: 18px; }
+.qa dd { margin-top: var(--space-3); color: var(--color-text-muted-on-dark); }
+
+.foot { padding: var(--space-10) 0 var(--space-12); border-top: 1px solid var(--color-border-on-dark);
+        display: flex; flex-wrap: wrap; gap: var(--space-5); justify-content: space-between; }
+.foot a { color: var(--color-text-muted-on-dark); text-decoration: none; }
+.foot a:hover { color: var(--color-text-accent); }
+
+</style>
+</head>
+<body>
+
+<div class="bg-fixed" aria-hidden="true"></div>
+<div class="decor-arc decor-arc--a" aria-hidden="true"></div>
+<div class="decor-arc decor-arc--b" aria-hidden="true"></div>
+<div class="decor-grit" aria-hidden="true"></div>
+<span class="edge-code" aria-hidden="true">KAGE · v0.1 · 2026</span>
+
+<main class="site-wrap">
+
+  <nav class="nav">
+    <span class="nav-mark">kage</span>
+    <div class="nav-links">
+      <a class="nav-link" href="index-en.html" aria-current="true">顯影 / DEVELOP</a>
+      <a class="nav-link" href="index-develop.html">繁中</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="decor-dash" aria-hidden="true"></div>
+    <h1 class="hero-aphorism" style="margin-top:var(--space-5)">The light sits outside the frame. What stays is the shadow.</h1>
+    <p class="hero-lede">kage routes AI prompt inputs into 16 self-contained HTML document structures (8 types × 2 language tracks). 45 color tokens map the design system baseline into pure screen HTML, while Noto Serif TC typography anchors within frame boundaries to displace synthetic digital sharpness.</p>
+    <div class="spec-strip">
+      <div><span>基色</span><b>#000000 → luma 12.8</b></div>
+      <div><span>漏光</span><b>18–30° · 24% / 19%</b></div>
+      <div><span>字型</span><b>Noto Serif TC</b></div>
+      <div><span>顆粒</span><b>SD 7.4</b></div>
+      <div><span>授權</span><b>MIT</b></div>
+    </div>
+  </header>
+
+
+  <section class="sec" id="s00">
+    <p class="sec-num">00 · SHOWCASE</p>
+    <h2 class="sec-title">Eight document types as physical render records</h2>
+    <p class="sec-lede">Partitioned into 8 document types across 2 language tracks, totaling 16 render files locked as self-contained HTML.</p>
+    <div class="sec-body"><div class="g3">
+      <figure class="shot">
+        <a href="../assets/demos/demo-archive-proposal-en.html">
+          <img src="../assets/demos/demo-archive-proposal-en-1280.png" alt="One-pager proposal structure for Municipal Archives Filing locking 3 metric cards.">
+        </a>
+        <figcaption><span class="kind">one-pager</span>Filing overhead compressed by 40%, clamping executive decision window to 30 seconds.</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-index-engine-en.html">
+          <img src="../assets/demos/demo-index-engine-en-1280.png" alt="Architecture decision record for offline index engine featuring executive summary and 2-column structural grid.">
+        </a>
+        <figcaption><span class="kind">long-doc</span>Severed real-time RPC for 100% offline indexing, arresting query latency at the 12ms boundary.</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-packaging-equity-en.html">
+          <img src="../assets/demos/demo-packaging-equity-en-1280.png" alt="Semiconductor packaging equity report showing target price and 2 valuation models.">
+        </a>
+        <figcaption><span class="kind">equity-report</span>Advanced packaging volume trajectory doubles by 2026, rating upgraded to buy at 35% upside baseline.</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-document-portfolio-en.html">
+          <img src="../assets/demos/demo-document-portfolio-en-1280.png" alt="Document design portfolio presenting 3 physical case studies and quantitative metrics.">
+        </a>
+        <figcaption><span class="kind">portfolio</span>Recalibrated hierarchy lifted reader completion rate by 50% while lowering bounce rate by 25%.</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-review-notice-en.html">
+          <img src="../assets/demos/demo-review-notice-en-1280.png" alt="Preservation environment review letter featuring 600-weight serif signature.">
+        </a>
+        <figcaption><span class="kind">letter</span>Relative humidity breaching 65% threshold mandates HVAC calibration within a 7 day window.</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-aperture-changelog-en.html">
+          <img src="../assets/demos/demo-aperture-changelog-en-1280.png" alt="Offline archiving tool changelog featuring v2.4.0 release and 3 breaking change logs.">
+        </a>
+        <figcaption><span class="kind">changelog</span>Excised legacy XML parser, causing peak memory footprint to drop by 60%.</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-legibility-talk-en.html">
+          <img src="../assets/demos/demo-legibility-talk-en-1280.png" alt="Presentation slides on static file legibility with 16:9 layout and chapter slide.">
+        </a>
+        <figcaption><span class="kind">slides</span>Shedding dynamic APIs into pure HTML secures raw readability across a 30 year horizon.</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-aperture-site-en.html">
+          <img src="../assets/demos/demo-aperture-site-en-1280.png" alt="Product landing page for offline archiving tool featuring Hero section and 2 CTA buttons.">
+        </a>
+        <figcaption><span class="kind">landing-page</span>Explicitly locked product category, driving conversion rate baseline up by 18% in 1 week.</figcaption>
+      </figure>
+    </div>
+    <p class="sec-lede" style="margin-top:var(--space-6)">Clicking any of the 8 thumbnails renders the standalone HTML document. Zero external CSS dependencies, with shared code blocks maintaining 100% verbatim parity across all 16 templates.</p></div>
+  </section>
+
+
+  <section class="sec" id="s01">
+    <p class="sec-num">01 · USAGE</p>
+    <h2 class="sec-title">Physical Mapping from Prompt into HTML</h2>
+    <p class="sec-lede">Input intent string and the mechanism routes it in 1 step into 1 of 8 document types across Chinese or English.</p>
+    <div class="sec-body"><div class="g2">
+      <div class="measure"><p>kage bounds 8 document types: one-pager, long-doc, equity-report, portfolio, letter, changelog, slides, and landing-page. Each type applies a JSON Schema contract to clamp text volume within hard capacity limits.</p><p style="margin-top:var(--space-4)">All 16 templates freeze as self-contained single HTML files, sharing 45 color tokens and CSS rules. Free of compilers or frameworks, outputs land directly into any browser engine.</p></div>
+      <aside class="cp-panel surf surf--card"><dl>
+        <dt>Input Intent</dt><dd>Input 1 natural language prompt, e.g. "Write v2.4.0 changelog for offline archiving tool with 3 highlights".</dd>
+        <div class="decor-rule" aria-hidden="true"></div>
+        <dt style="margin-top:var(--space-4)">Output Artifact</dt><dd>Receive 1 fully styled HTML physical record embedding the tactile layout shared by all 16 templates.</dd>
+      </dl></aside>
+    </div></div>
+  </section>
+
+
+  <section class="sec" id="s02">
+    <p class="sec-num">02 · MANIFESTO</p>
+    <h2 class="sec-title">Paper, Film, and the Physical World</h2>
+    <p class="sec-lede">3 physical constraints locking the texture and boundaries of digital documents.</p>
+    <div class="sec-body"><div class="measure">
+      <p class="t-lead">Rebuild physical touch: rejection of stark white or black, settling a 12.8 composite luma over #000000 base.</p>
+      <p class="t-lead" style="margin-top:var(--space-5)">Eliminate digital sharpness: using SD 7.4 achromatic noise and 18–30° light leak to absorb high-frequency glow.</p>
+      <p class="t-lead" style="margin-top:var(--space-5)">Restraint over decoration: motif hard-capped at 4 types, enforcing a 2-way mutual exclusivity rule for arc and scratch.</p>
+    </div></div>
+  </section>
+
+
+  <section class="sec" id="s03">
+    <p class="sec-num">03 · COLOR</p>
+    <h2 class="sec-title">45 Tokens Mapping Optical Energy Spectrum</h2>
+    <p class="sec-lede">System anchors 45 color tokens to a single truth baseline. Base rendering at #000000 yields 12.8 composite luma after noise integration. Light leak hue is held at 18–30°, positioned outside frame boundaries.</p>
+    <div class="sec-body">
+  <div class="sw-group">
+    <p class="t-label t-muted">基底與漏光<span class="sw-en">Base & Leak</span></p>
+    <div class="sw-row">
+      <figure class="sw">
+        <div class="sw-chip" style="background:#000000"></div>
+        <figcaption>
+          <code class="sw-hex">#000000</code>
+          <span class="sw-note">繪製基色。合成後約 luma 12.8</span>
+          <span class="sw-luma decor-num">luma 0.0</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#1a1210"></div>
+        <figcaption>
+          <code class="sw-hex">#1a1210</code>
+          <span class="sw-note">漏光最外緣</span>
+          <span class="sw-luma decor-num">luma 19.6</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#26170f"></div>
+        <figcaption>
+          <code class="sw-hex">#26170f</code>
+          <span class="sw-note">中段</span>
+          <span class="sw-luma decor-num">luma 25.6</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#331c0f"></div>
+        <figcaption>
+          <code class="sw-hex">#331c0f</code>
+          <span class="sw-note">主體</span>
+          <span class="sw-luma decor-num">luma 32.0</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#432513"></div>
+        <figcaption>
+          <code class="sw-hex">#432513</code>
+          <span class="sw-note">邊緣峰值</span>
+          <span class="sw-luma decor-num">luma 42.1</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#683e1d"></div>
+        <figcaption>
+          <code class="sw-hex">#683e1d</code>
+          <span class="sw-note">最亮點，面積 < 0.5%</span>
+          <span class="sw-luma decor-num">luma 68.5</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="sw-group">
+    <p class="t-label t-muted">文字<span class="sw-en">Text</span></p>
+    <div class="sw-row">
+      <figure class="sw">
+        <div class="sw-chip" style="background:#eee4d5"></div>
+        <figcaption>
+          <code class="sw-hex">#eee4d5</code>
+          <span class="sw-note">正文</span>
+          <span class="sw-luma decor-num">luma 229.0</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#bba893"></div>
+        <figcaption>
+          <code class="sw-hex">#bba893</code>
+          <span class="sw-note">次要與中繼資料</span>
+          <span class="sw-luma decor-num">luma 170.5</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#a95d35"></div>
+        <figcaption>
+          <code class="sw-hex">#a95d35</code>
+          <span class="sw-note">強調。24px 以下禁用</span>
+          <span class="sw-luma decor-num">luma 106.3</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="sw-group">
+    <p class="t-label t-muted">表面與材質<span class="sw-en">Surface & Material</span></p>
+    <div class="sw-row">
+      <figure class="sw">
+        <div class="sw-chip" style="background:#29241e"></div>
+        <figcaption>
+          <code class="sw-hex">#29241e</code>
+          <span class="sw-note">深色卡片表面</span>
+          <span class="sw-luma decor-num">luma 36.6</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#e8dfcf"></div>
+        <figcaption>
+          <code class="sw-hex">#e8dfcf</code>
+          <span class="sw-note">淺色紙張，累計面積 ≤ 25%</span>
+          <span class="sw-luma decor-num">luma 223.8</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#d8c8aa"></div>
+        <figcaption>
+          <code class="sw-hex">#d8c8aa</code>
+          <span class="sw-note">書信專用紙色</span>
+          <span class="sw-luma decor-num">luma 201.2</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#424242"></div>
+        <figcaption>
+          <code class="sw-hex">#424242</code>
+          <span class="sw-note">塵點</span>
+          <span class="sw-luma decor-num">luma 66.0</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#56524d"></div>
+        <figcaption>
+          <code class="sw-hex">#56524d</code>
+          <span class="sw-note">刮痕</span>
+          <span class="sw-luma decor-num">luma 82.5</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div></div>
+  </section>
+
+
+  <section class="sec" id="s04">
+    <p class="sec-num">04 · TYPOGRAPHY</p>
+    <h2 class="sec-title">Serif Typography for Print Material Tension</h2>
+    <p class="sec-lede">Loaded with self-hosted OFL-licensed Noto Serif TC, constraining headings and body to serif stroke geometry. Sans-serif retreats to 3 functional coordinates: navigation, dates, and serial numbers.</p>
+    <div class="sec-body"><div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">display · 64px</span>
+        <p class="t-display ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">大標</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">h1 · 44px</span>
+        <p class="t-h1 ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">章標</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">h2 · 30px</span>
+        <p class="t-h2 ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">節標</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">h3 · 22px</span>
+        <p class="t-h3 ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">小節</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">body-lead · 18px</span>
+        <p class="t-lead ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">導言</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">body · 16px</span>
+        <p class=" ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">正文</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">small · 14px</span>
+        <p class="t-small ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">附註</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">caption · 13px</span>
+        <p class="t-caption ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">圖說</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">label · 11px</span>
+        <p class="t-label ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <span class="ty-note t-caption t-muted">標籤</span>
+      </div>
+    </div>
+    <p class="sec-lede" style="margin-top:var(--space-6)">Serif letterforms create stroke resistance across 1280×800 viewports, arresting pixel bloom to establish tangible print tension.</p></div>
+  </section>
+
+
+  <section class="sec" id="s05">
+    <p class="sec-num">05 · MATERIAL</p>
+    <h2 class="sec-title">4 Layer Physical Stacked Background Architecture</h2>
+    <p class="sec-lede">Four physical layers stack the background: drawn base, warm leak, optional central sink, grain always topmost. Arcs and dust belong to the decorative vocabulary and are not counted among them.</p>
+    <div class="sec-body"><div class="g2">
+      <div class="measure">
+        <p>Solid screen pixels offer zero physical resistance. The renderer injects a 200×200 grayscale PNG noise texture, depositing a baseline luma standard deviation of 7.4.</p>
+        <p style="margin-top:var(--space-4)">Light leak intensity steps across 3 page hierarchy tiers: narrative tier caps at 24%/19%, while reading tier scales down to 10%/8%. Source sits outside frame, keeping center body luma strictly below 20.</p>
+      </div>
+      <aside class="cp-panel surf surf--card"><dl>
+        <dt>L1 · Drawn base</dt><dd>Pure black #000000. This is the colour actually painted, not the colour you see.</dd>
+        <dt>L2 · Warm leak</dt><dd>Screen blend. The core is anchored off-canvas; only the falloff enters the frame.</dd>
+        <dt>L3 · Central sink (optional)</dt><dd>Needed only over a full-bleed image. A flat base needs none — the centre is already darkest.</dd>
+        <dt>L4 · Film grain</dt><dd>Normal blend, always topmost. Composited luminance lands near 12.8.</dd>
+      </dl></aside>
+    </div></div>
+  </section>
+
+
+  <section class="sec" id="s06">
+    <p class="sec-num">06 · MOTIFS</p>
+    <h2 class="sec-title">4 Physically Bounded Decorative Scale Vocabularies</h2>
+    <p class="sec-lede">Motif system clamps to 4 items: geometric lines/arcs, dust specks, mirrored ghosting, and edge micro-type. Arcs and scratches follow 2 mutually exclusive rules, with dust coverage bounded below 0.1%.</p>
+    <div class="sec-body"><div class="g2" style="grid-template-columns:1fr 1fr">
+      <figure class="mo">
+        <div class="mo-stage"><div class="mo-arc" aria-hidden="true"></div></div>
+        <figcaption><span class="decor-num">01</span>幾何細線與弧線<span class="mo-note">1px 大半徑圓弧，不裁切、直接穿出畫面外</span></figcaption>
+      </figure>
+      <figure class="mo">
+        <div class="mo-stage"><div class="mo-grit" aria-hidden="true"></div></div>
+        <figcaption><span class="decor-num">02</span>塵點<span class="mo-note">位置寫死不隨機，合計面積 < 0.1%</span></figcaption>
+      </figure>
+      <figure class="mo">
+        <div class="mo-stage"><span class="ghost t-label t-muted" data-ghost="SPECIMEN">SPECIMEN</span></div>
+        <figcaption><span class="decor-num">03</span>鏡像重影<span class="mo-note">既有英文小標下方的垂直翻轉副本，不新增內容</span></figcaption>
+      </figure>
+      <figure class="mo">
+        <div class="mo-stage"><span class="mo-edge decor-num">KAGE · v0.1 · 2026</span></div>
+        <figcaption><span class="decor-num">04</span>邊緣編目微型字<span class="mo-note">屬材質而非資訊，內容取自頁面既有中繼資料</span></figcaption>
+      </figure></div></div>
+  </section>
+
+
+  <section class="sec" id="s07">
+    <p class="sec-num">07 · COMPONENTS</p>
+    <h2 class="sec-title">Restrained UI Modules with Physical Hierarchy</h2>
+    <p class="sec-lede">Featuring 3 components: buttons, blockquotes, and paper surfaces, all passing the 4.5:1 contrast barrier.</p>
+    <div class="sec-body"><div class="g2">
+      <div>
+        <div class="cp">
+          <a class="btn btn-primary" href="https://github.com/workingyuanyuan/Kage">View Source<span aria-hidden="true">→</span></a>
+          <a class="btn btn-secondary" href="https://github.com/workingyuanyuan/Kage/blob/main/SKILL.md">Read Document</a>
+        </div>
+        <blockquote class="quote" style="margin-top:var(--space-6)">"Text bears structure, images bear atmosphere; restraint and order form the foundation of long-term legibility."</blockquote>
+      </div>
+      <aside class="cp-panel surf surf--paper">
+        <p class="t-small">Light paper surface cumulative area capped strictly within 25% bounds, hue coordinates held at 18–30°.</p>
+      </aside>
+    </div></div>
+  </section>
+
+
+  <section class="sec" id="s08">
+    <p class="sec-num">08 · ACCEPTANCE</p>
+    <h2 class="sec-title">8 Hard Quantifiable Automated Verification Checks</h2>
+    <p class="sec-lede">Build pipeline automatically verifies 8 physical metrics scales, ensuring all 16 template outputs pass tolerance tests.</p>
+    <div class="sec-body"><ol class="chk">
+      <li><span class="n">01</span>
+        <div><b>1. Reverse Vignetting Distribution</b><span>Luma of center 20% zone strictly bounded lower than outer 10% edge zone scale.</span></div></li>
+      <li><span class="n">02</span>
+        <div><b>2. Edge Stability</b><span>Cross-screenshot edge luma fluctuation amplitude clamped within ±10%.</span></div></li>
+      <li><span class="n">03</span>
+        <div><b>3. Luma Area Ratio</b><span>Luma ≥48 coverage < 4%, ≥80 < 0.15%, <32 ≥ 84%.</span></div></li>
+      <li><span class="n">04</span>
+        <div><b>4. Grain Standard Deviation</b><span>Overlaid grain luma standard deviation clamped to 6–14, baseline anchored at 7.4.</span></div></li>
+      <li><span class="n">05</span>
+        <div><b>5. Three-Channel Achromatic Check</b><span>RGB three-channel residual amplitude variance bounded below 5% to lock noise neutrality.</span></div></li>
+      <li><span class="n">06</span>
+        <div><b>6. Clean Region Low-Frequency Residual</b><span>Clean area 64/128px scale residual held under 0.7 threshold to eliminate low-frequency mottling.</span></div></li>
+      <li><span class="n">07</span>
+        <div><b>7. Background Hue Range</b><span>Background hue coordinates bounded exclusively to 18–30° or 180–192° paths.</span></div></li>
+      <li><span class="n">08</span>
+        <div><b>8. Body Column Luma Constraint</b><span>Body column low-frequency luma p99 ≤ 20 and p99−p1 ≤ 8, damping luma drift.</span></div></li>
+    </ol></div>
+  </section>
+
+
+  <section class="sec" id="s09">
+    <p class="sec-num">09 · QUESTIONS</p>
+    <h2 class="sec-title">Frequently Asked Questions on Physical Mechanisms of kage</h2>
+    <p class="sec-lede">Deconstructing 4 mechanism questions on positioning, output scope, optics, and develop mode.</p>
+    <div class="sec-body"><dl class="qa">
+      <dt>1. What is kage?</dt><dd>kage is an AI Agent Skill mapping inputs into physical HTML documents. It locks 16 templates and 45 color tokens into a standalone design system baseline.</dd>
+      <dt>2. What can kage generate?</dt><dd>Outputs 8 document types: one-pager, long-doc, equity-report, portfolio, letter, changelog, slides, and landing-page, total 16 pure screen HTML templates in Chinese and English.</dd>
+      <dt>3. What is the core aesthetic philosophy?</dt><dd>Texture originates from physical silver-halide film stocks. By mapping a #000000 base, 7.4 SD noise, and 18–30° light leak decay, digital frequency translates into analog optical exposure.</dd>
+      <dt>4. What is Develop Mode?</dt><dd>Develop Mode projects abstract assertions into objective physical scales. It remains in a disabled state by default, requiring explicit user prompt commands to unlock physical translation.</dd>
+    </dl></div>
+  </section>
+
+  <footer class="foot t-meta">
+    <span>kage · 2026 · MIT</span>
+    <span>
+      <a href="https://github.com/workingyuanyuan/Kage">原始碼</a> ·
+      <a href="https://github.com/workingyuanyuan/Kage/blob/main/SKILL.md">說明文件</a> ·
+      <a href="https://github.com/workingyuanyuan/Kage/issues">問題回報</a>
+    </span>
+  </footer>
+
+</main>
+</body>
+</html>

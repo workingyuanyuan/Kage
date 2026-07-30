@@ -1,0 +1,61 @@
+{
+  "category": "CLI Asset Pipeline Tool",
+  "product_name": "Aperture",
+  "tagline": "Single-file dependency-free static asset compilation pipeline",
+  "facts": [
+    "v2.4.0 Stable Release",
+    "MIT License",
+    "Supports macOS / Linux / Windows",
+    "Zero Runtime Dependencies"
+  ],
+  "cta": {
+    "primary": "Download CLI",
+    "secondary": "Read Documentation"
+  },
+  "gallery": [
+    {
+      "image": "../img/grain-200.png",
+      "caption": "Compilation pipeline completes under 12ms with clear diff reports and dead code pruning"
+    },
+    {
+      "image": "../img/grain-200.png",
+      "caption": "Offline visual texture baking panel with precise control over grain and light leak intensity"
+    }
+  ],
+  "features": [
+    {
+      "name": "Asset Tree Pruning",
+      "subtitle": "Zero dead code retention",
+      "description": "Analyzes DOM structure and CSS selector utilization to eliminate unused rules and typography styles, dramatically reducing bundle size."
+    },
+    {
+      "name": "Static Grain & Texture Baking",
+      "subtitle": "Offline light and shadow engine",
+      "description": "Bakes subtle tactile depth directly into HTML background layers, avoiding runtime rendering overhead and frame drops."
+    },
+    {
+      "name": "Strict Content Contract Audit",
+      "subtitle": "Field length & type gatekeeper",
+      "description": "Validates all field lengths and structural schemas during build time to guarantee generated static assets are complete and overflow-free."
+    },
+    {
+      "name": "Multilingual Bundling Engine",
+      "subtitle": "Static locale routing pipeline",
+      "description": "Injects language-specific typography metrics and line-width rules automatically, ensuring optimal legibility for both Latin and CJK scripts."
+    }
+  ],
+  "faq": [
+    {
+      "q": "How does Aperture differ from traditional bundlers like Vite or Webpack?",
+      "a": "Aperture focuses exclusively on generating self-contained, immutable static documents with physical tactile aesthetics. It injects zero JavaScript framework runtimes, compiling semantics, layout, and static textures directly into a single HTML file."
+    },
+    {
+      "q": "Can files compiled with Aperture be viewed completely offline?",
+      "a": "Yes. All fonts, textures, and stylesheets utilize local relative paths or Base64 embeddings. The resulting standalone HTML files can be opened directly from local drives and will render accurately decades later."
+    },
+    {
+      "q": "How can I integrate Aperture into existing CI/CD automation pipelines?",
+      "a": "Aperture provides a standard CLI and Node.js API. A single command, aperture compile, handles validation and compilation, returning standard exit codes (0/1) for seamless CI integration."
+    }
+  ]
+}

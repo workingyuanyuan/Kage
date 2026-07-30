@@ -1,0 +1,55 @@
+{
+  "name": "Sonetto · Document Design Lab",
+  "positioning": "Establishing citable layouts for longform reports amidst dark fields and serif hierarchies.",
+  "contact": "sonetto@example.com · Taipei",
+  "about": "Most projects landed on my desk because someone wrote solid content, yet nobody finished reading it. My job isn't to make layouts pretty—it's to overhaul reading paths: first determining when readers need a decision, then setting headings, line lengths, and accents. The three case studies cover a research report, technical doc, and product page. They share the same constraints—a pitch-black background, off-screen warm light, and fixed serif hierarchy. Same constraints, wildly different outcomes—all driven by the content's own structure.",
+  "projects": [
+    {
+      "title": "Above-the-Fold Overhaul for a Semiconductor Report",
+      "kind": "Research Report",
+      "period": "2026.03 – 2026.05",
+      "description": "Packing ratings, target price, and upside into screen one, allowing institutional readers to decide whether to read on within 30 seconds.",
+      "role": "Layout architecture and typographic hierarchy; co-determining information sequence with analysts.",
+      "challenge": "The draft buried investment logic on page four behind three pages of industry context. Readers saw zero actionable metrics on page one, so most bailed after the abstract. The real challenge wasn't layout but trade-offs: analysts insisted background set up the thesis, while readers demanded conclusions with data. Ultimately, four metric cards were moved to screen one, the three thesis points each carried one key figure, and background became supporting context in chapter two. Metric cards had no borders—separation used white space and a short dash, avoiding spreadsheet-like boxes.",
+      "outcomes": [
+        "Rating, target price, market cap, and P/E ratio moved into screen one, making the first screen actionable for decision-making.",
+        "The P/E range chart directly marks current price position, replacing lengthy narrative text descriptions of range.",
+        "Body text column width capped at 38em, noticeably reducing line-wrap eye jump during long reading sessions."
+      ],
+      "images": ["../img/demo/case-equity.png"]
+    },
+    {
+      "title": "Readability Overhaul for Architecture Decision Records",
+      "kind": "Technical Document",
+      "period": "2026.01 – 2026.03",
+      "description": "A four-chapter index engine architecture record, enabling non-participating engineers to reconstruct historical trade-offs just by reading.",
+      "role": "Information architecture, diagram design, and typography.",
+      "challenge": "The most fatal flaw in technical docs is detailing what was built while ignoring what was discarded. The original draft had complete implementation steps but omitted why B+ Tree was rejected. Six months later, such docs become unmaintainable because successors see conclusions without constraints. During restructuring, the opening paragraph of each chapter was locked into a thesis statement, while write and query paths were drawn as parallel pipelines—a single diagram replacing three blocks of text and making bottlenecks instantly visible.",
+      "outcomes": [
+        "First paragraph of each chapter standardized to a 2–3 sentence thesis statement, suitable for standalone citation.",
+        "Dual-pipeline architecture diagram replaced three narrative process blocks, rendering bottleneck locations visible at a glance.",
+        "All external data retained source attribution tags, clearly separating facts, judgments, and inferences."
+      ],
+      "images": ["../img/demo/case-index.png"]
+    },
+    {
+      "title": "Consistency Alignment for Product Page & Changelog",
+      "kind": "Product Page · Changelog",
+      "period": "2025.10 – 2025.12",
+      "description": "Product landing page and release logs for the same tool; ensuring version numbers, feature descriptions, and tone stay perfectly synchronized.",
+      "role": "Content contract definition and typography across both documents.",
+      "challenge": "Product pages sell visions while changelogs record facts. Written by different people on different timelines, version numbers misaligned and feature names diverged, forcing readers to translate manually between them. The remedy was a unified content contract: both docs shared identical feature names and version facts, controlling only presentation order. Breaking changes were pinned to the top of changelogs with migration commands, while specs on the product page directly cited the same data pool. Most effort went into upfront alignment; formatting itself was swift.",
+      "outcomes": [
+        "Version numbers and feature naming served from a single source of truth, ending document drift between pages.",
+        "Breaking changes pinned to top with migration examples, sparing users from reading the full text to discover potential breakage.",
+        "Product page specs and log metrics share a single data source; numerical discrepancies are flagged and blocked during validation."
+      ],
+      "images": ["../img/demo/case-site.png"]
+    }
+  ],
+  "more_works": [
+    "Municipal Archives Archiving Proposal (One-Page Solution)",
+    "Annual Preservation Environment Audit Notice (Formal Letter)",
+    "Long-Term Readability of Static Files (Presentation Slide Deck)"
+  ]
+}

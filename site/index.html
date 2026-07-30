@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<!-- 影 · kage 官網。由 scripts/build-site.mjs 生成，不要手改。
+     BASE 區塊與模板逐字共用，由 kage sync 校驗。 -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>影 · kage — 文件生成 Skill 與設計系統</title>
+<meta name="description" content="給 AI 代理一段需求，產出一份排好版的 HTML 文件。16 份模板、45 個色彩 token、純螢幕交付。">
+<meta name="author" content="workingyuanyuan">
+<meta name="generator" content="kage">
+<link rel="canonical" href="https://example.com/kage/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="影 · kage — 文件生成 Skill 與設計系統">
+<meta property="og:description" content="給 AI 代理一段需求，產出一份排好版的 HTML 文件。16 份模板、45 個色彩 token、純螢幕交付。">
+<meta property="og:image" content="../assets/demos/demo-archive-proposal-1280.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/fonts/noto-serif-tc/noto-serif-tc.css">
+<style>
+/* ===== BASE BEGIN — 全部模板逐字共用，不得單獨修改 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* 色彩 — 與 references/tokens.json 逐字一致 */
+  --color-accent-primary:         #a95d35;
+  --color-accent-secondary:       #b55829;
+  --color-accent-hover:           #db6f39;
+  --color-accent-pressed:         #7c4120;
+
+  --color-background-base:        #000000;   /* 實際繪製色 */
+  --color-background-global:      #0d0d0d;   /* 疊顆粒後的目標值，不可直接當底色 */
+  --color-background-field-warm:  #0f0f0f;
+  --color-background-field-cool:  #0c0e0f;
+  --color-background-deep:        #050505;
+  --color-background-overlay:     rgb(9 9 9 / 52%);
+
+  --color-leak-1:                 #1a1210;
+  --color-leak-2:                 #26170f;
+  --color-leak-3:                 #331c0f;
+  --color-leak-4:                 #432513;
+  --color-leak-core:              #683e1d;
+  --color-leak-source:            rgb(255 114 29 / 24%);
+
+  --color-tint-cool:              #111516;
+
+  --color-grain:                  rgb(128 128 128 / 10%);
+  --color-dust:                   #424242;
+  --color-scratch:                #56524d;
+  --color-hairline:               rgb(238 228 213 / 11%);
+
+  --color-surface-dark:           #29241e;
+  --color-surface-dark-secondary: #40362c;
+  --color-paper-surface:          #e8dfcf;
+  --color-paper-light:            #f0e8da;
+  --color-paper-letter:           #d8c8aa;
+
+  --color-text-on-dark:           #eee4d5;
+  --color-text-muted-on-dark:     #bba893;
+  --color-text-on-light:          #29241e;
+  --color-text-muted-on-light:    #6f6559;
+
+  --color-text-accent:            #a95d35;
+  --color-text-accent-hover:      #db6f39;
+  --color-text-emphasis:          #7c4120;
+  --color-text-on-accent:         #f0e8da;
+
+  --color-border-accent:          #a95d35;
+  --color-border-on-dark:         rgb(238 228 213 / 32%);
+  --color-border-on-light:        rgb(124 65 32 / 28%);
+
+  --color-link:                   #a95d35;
+  --color-link-hover:             #db6f39;
+  --color-focus-ring:             #db6f39;
+  --color-icon-accent:            #b55829;
+
+  --color-state-success:          #6b7350;
+  --color-state-warning:          #9a7433;
+  --color-state-error:            #9c4a3c;
+  --color-state-info:             #5c6b78;
+
+  /* 間距 */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px;  --space-6: 32px;  --space-8: 48px;  --space-10: 64px;
+  --space-12: 96px; --space-16: 128px;
+
+  /* 字體 */
+  --serif: "Noto Serif TC", "Source Han Serif TC", "Source Han Serif TW",
+           "Songti TC", "PMingLiU", Georgia, serif;
+  --sans:  "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --mono:  ui-monospace, "SF Mono", Consolas, monospace;
+
+  --container: 1200px;
+  --measure:   38em;        /* 正文行寬上限，約 646px */
+
+  /* 漏光光源的 RGB 通道。--color-leak-source 已把 alpha 烘進去，
+     而漏光強度需隨頁型變動，故另存通道三元組供 rgb() 組裝。 */
+  --leak-rgb: 255 114 29;
+
+  /* 漏光強度預設 A 敘事型，由頁型 class 覆寫 */
+  --leak-a: 24%;
+  --leak-b: 19%;
+}
+.tier-structural { --leak-a: 15%; --leak-b: 12%; }
+.tier-reading    { --leak-a: 10%; --leak-b:  8%; }
+
+html { background-color: var(--color-background-base); }
+body {
+  font-family: var(--serif); font-size: 16px; line-height: 1.85;
+  color: var(--color-text-on-dark);
+  -webkit-font-smoothing: antialiased;
+}
+:lang(en) { line-height: 1.70; }
+
+/* ── 背景四層：繪製基色 + 暖色漏光 + 顆粒，全部錨定視窗 ──
+   基色與漏光必須在同一元素的 background stack，background-blend-mode 才生效。
+   漸層水平半徑用 vw 不能用 %（% 無法與長度混入 min()，整條 background-image
+   會靜默退回 none）；垂直半徑維持 % 以對應 visual viewport。            */
+.bg-fixed {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-color: var(--color-background-base);
+  background-image:
+    radial-gradient(ellipse min(55vw, 900px) 90% at 104% 50%,
+                    rgb(var(--leak-rgb) / var(--leak-a)) 0%, rgb(var(--leak-rgb) / 0%) 100%),
+    radial-gradient(ellipse min(45vw, 760px) 70% at -6% 88%,
+                    rgb(var(--leak-rgb) / var(--leak-b)) 0%, rgb(var(--leak-rgb) / 0%) 100%);
+  background-blend-mode: screen;
+}
+.bg-fixed::after {
+  content: ""; position: absolute; inset: 0;
+  opacity: .10;
+  background-image: url("../assets/img/grain-200.png");
+  background-size: 200px 200px;
+  /* 顆粒為靜態材質，不得加入閃爍、位移或任何動畫 */
+}
+main { position: relative; z-index: 1; }
+
+/* ── 局部表面：只有顆粒，不套漏光與中央沉暗構圖 ── */
+.surf { position: relative; }
+.surf > * { position: relative; z-index: 2; }
+.surf::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: .10;
+  background-image: url("../assets/img/grain-200.png");
+  background-size: 200px 200px;
+}
+.surf--card   { background-color: var(--color-surface-dark); }
+.surf--sub    { background-color: var(--color-surface-dark-secondary); }
+.surf--paper  { background-color: var(--color-paper-surface);  color: var(--color-text-on-light); }
+.surf--light  { background-color: var(--color-paper-light);    color: var(--color-text-on-light); }
+.surf--letter { background-color: var(--color-paper-letter);   color: var(--color-text-on-light); }
+.surf--paper::after, .surf--light::after, .surf--letter::after {
+  opacity: .055; mix-blend-mode: multiply;   /* 紙張要讀成纖維而非反光 */
+}
+
+/* ── 排印 ── */
+.t-display { font-size: 64px; font-weight: 600; line-height: 1.10; letter-spacing: .04em; }
+.t-h1      { font-size: 44px; font-weight: 600; line-height: 1.16; letter-spacing: .04em; }
+.t-h2      { font-size: 30px; font-weight: 600; line-height: 1.25; letter-spacing: .03em; }
+.t-h3      { font-size: 22px; font-weight: 600; line-height: 1.35; letter-spacing: .02em; }
+.t-lead    { font-size: 18px; line-height: 1.80; }
+.t-small   { font-size: 14px; line-height: 1.70; }
+.t-caption { font-size: 13px; line-height: 1.65; letter-spacing: .04em; }
+.t-label   { font-family: var(--sans); font-size: 11px; line-height: 1.60;
+             letter-spacing: .28em; text-transform: uppercase; }
+.t-meta    { font-family: var(--sans); font-size: 11px; line-height: 1.60; letter-spacing: .28em; }
+.t-muted   { color: var(--color-text-muted-on-dark); }
+.t-accent  { color: var(--color-text-accent); }
+.t-num     { font-variant-numeric: tabular-nums; }
+
+/* 正文欄：C 級必須置中且不超過 --measure，否則會落進邊緣漸亮區 */
+.measure   { max-width: var(--measure); }
+.tier-reading .measure { margin-inline: auto; }
+:lang(en) .measure { max-width: 60ch; }
+
+/* ── 印刷裝飾：真實元素，純裝飾帶 aria-hidden ── */
+.decor-rule    { height: 1px; background: var(--color-border-on-dark); }
+.decor-dash    { width: 24px; height: 2px; background: var(--color-accent-secondary); }
+.decor-num     { font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+                 color: var(--color-text-muted-on-dark); }
+.decor-corner  { position: absolute; width: 10px; height: 10px;
+                 border-top: 1px solid var(--color-border-on-dark);
+                 border-left: 1px solid var(--color-border-on-dark); }
+.decor-dust    { position: absolute; width: 2px; height: 2px; border-radius: 50%;
+                 background: var(--color-dust); }
+.decor-scratch { position: absolute; width: 1px; opacity: .55;
+                 background: var(--color-scratch); }
+
+/* 幾何細線與弧線：大半徑圓弧，不裁切、直接穿出畫面外。
+   整圈 1px 橢圓只有一小段落在畫面內，讀成一道構圖弧而不是一個圓。 */
+/* fixed 而非 absolute：無定位祖先時 absolute 會落在初始包含塊上，
+   長頁面捲動後裝飾就離開畫面了。這些和顆粒同屬背景材質，一律錨定視窗。 */
+.decor-arc     { position: fixed; pointer-events: none; z-index: 0;
+                 border: 1px solid var(--color-hairline); border-radius: 50%; }
+.decor-arc--a  { width: 120vw; height: 120vw; left: -14vw; top: -64vw; }
+.decor-arc--b  { width:  86vw; height:  86vw; right: -30vw; bottom: -46vw; }
+
+/* 塵點：位置寫死不隨機 —— 隨機會讓每次重載的分布不同，而磨損是靜態材質。
+   面積 12 個 2px 塵點共 48px²，遠低於 1280×800 的 1000px² 預算。
+
+   **不與弧線同時出現斷續刮痕。** 弧線是構圖語彙、刮痕是損傷語彙，兩者的
+   觀感不同，疊在一起會互相抵銷。用了弧線就只配塵點。
+
+   不壓透明度，塵點就是規格寫的 --color-dust。合成 luma 66 略高於天花板
+   標題那個 65，但第 3 條驗收判的是三條面積帶，12 個 2px 塵點共 48px²
+   對任何一帶都無足輕重。刮痕才需要 .55（luma 82.5），那寫在 .decor-scratch。 */
+.decor-grit    { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.decor-grit::before {
+                 content: ""; position: absolute; left: 9%; top: 22%;
+                 width: 2px; height: 2px; border-radius: 50%; background: var(--color-dust);
+                 box-shadow:
+                   14vw  9vh var(--color-dust),  31vw 27vh var(--color-dust),
+                   47vw  4vh var(--color-dust),  56vw 41vh var(--color-dust),
+                   63vw 15vh var(--color-dust),  72vw 33vh var(--color-dust),
+                   19vw 46vh var(--color-dust),  38vw 58vh var(--color-dust),
+                   58vw 66vh var(--color-dust),  77vw 55vh var(--color-dust),
+                   84vw 24vh var(--color-dust),  27vw 71vh var(--color-dust); }
+
+/* 鏡像重影：既有英文小標的處理手法，不新增內容 ——
+   data-ghost 必須與元素本身的文字相同，lint 會檢查兩者是否一致。 */
+.ghost         { position: relative; }
+.ghost::after  { content: attr(data-ghost); position: absolute; left: 0; top: 100%;
+                 transform: scaleY(-1); opacity: .14; pointer-events: none;
+                 -webkit-mask-image: linear-gradient(to bottom, #000, transparent 68%);
+                         mask-image: linear-gradient(to bottom, #000, transparent 68%); }
+
+/* 邊緣編目微型字：屬材質而非資訊，內容取自頁面既有中繼資料，不得杜撰。 */
+.edge-code     { position: fixed; right: var(--space-4); top: 50%; z-index: 0;
+                 transform: translateY(-50%) rotate(90deg); transform-origin: right center;
+                 font-family: var(--sans); font-size: 9px; letter-spacing: .5em;
+                 text-transform: uppercase; pointer-events: none;
+                 color: var(--color-text-muted-on-dark); opacity: .16; }
+
+/* ── 按鈕 ── */
+.btn { display: inline-flex; align-items: center; gap: var(--space-2);
+       padding: 12px 26px; border-radius: 1px; cursor: pointer; text-decoration: none;
+       font-family: var(--sans); font-size: 12px; font-weight: 600;
+       letter-spacing: .16em; text-transform: uppercase;
+       transition: background-color 150ms cubic-bezier(.2,0,0,1),
+                   color 150ms cubic-bezier(.2,0,0,1),
+                   border-color 150ms cubic-bezier(.2,0,0,1),
+                   transform 150ms cubic-bezier(.2,0,0,1); }
+.btn-primary   { background: var(--color-accent-primary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-cta       { background: var(--color-accent-secondary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-secondary { background: transparent; color: var(--color-text-on-dark);
+                 border: 1px solid var(--color-border-accent); }
+/* 標籤走米白而非橘棕：12px 橘棕在邊緣漏光區只有 2.85:1。
+   可操作性由橘棕邊框承擔，仍符合「透明背景 + 細邊框」。 */
+.btn-en        { font-size: 10px; letter-spacing: .24em; opacity: .72; }
+.btn:hover     { transform: translateY(-1px); }
+.btn:active    { transform: translateY(1px); }
+.btn-primary:hover    { background: var(--color-accent-hover); }
+.btn-primary:active   { background: var(--color-accent-pressed); }
+.btn-secondary:hover  { color: var(--color-text-accent-hover);
+                        border-color: var(--color-accent-hover); }
+/* 深色背景上的 Active 不落到 --color-accent-pressed（明度不足） */
+.btn-secondary:active { background: var(--color-accent-primary);
+                        color: var(--color-text-on-accent);
+                        border-color: var(--color-accent-primary); }
+.btn:disabled  { opacity: .4; cursor: not-allowed; pointer-events: none; transform: none; }
+
+.link { color: var(--color-link); text-decoration: none; }
+.link:hover { color: var(--color-link-hover); text-decoration: underline;
+              text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+/* ── 面板與表格 ── */
+.panel      { background: var(--color-surface-dark); padding: var(--space-6);
+              border: 1px solid var(--color-border-on-dark);
+              box-shadow: 0 1px 0 rgb(0 0 0 / 18%); }
+.panel-line { height: 1px; margin: var(--space-4) 0; background: var(--color-border-on-dark); }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table      { width: 100%; border-collapse: collapse;
+              border-top: 2px solid var(--color-border-accent); }
+.table th, .table td { padding: 12px 8px;
+              border-bottom: 1px solid var(--color-border-on-dark); }
+.table th   { text-align: left; font-weight: 400; font-family: var(--sans);
+              font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+              color: var(--color-text-muted-on-dark); }
+.table td   { font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* ── 引用與提示 ── */
+.quote     { display: flex; gap: var(--space-4); margin: 0; padding: 20px 24px;
+             border: 1px solid var(--color-border-on-light); }
+.quote-bar { flex-shrink: 0; width: 3px; background: var(--color-accent-primary); }
+.quote p   { margin: 0; font-size: 16px; line-height: 1.7; }
+.quote cite{ display: block; margin-top: var(--space-2); font-style: normal;
+             font-size: 13px; color: var(--color-text-muted-on-light); }
+.callout   { padding: var(--space-5); border-left: 3px solid var(--color-state-info); }
+.msg       { display: flex; align-items: center; gap: var(--space-2); font-size: 13px; }
+.msg--error   { color: var(--color-state-error); }
+.msg--warning { color: var(--color-state-warning); }
+.msg--success { color: var(--color-state-success); }
+.msg--info    { color: var(--color-state-info); }
+
+/* ── 圖片框架 ── */
+.plate      { margin: 0; padding: 12px; }
+.plate-wrap { position: relative; overflow: hidden; }
+.plate-wrap img { display: block; width: 100%; height: auto; }
+.plate-mask { position: absolute; inset: 0; pointer-events: none;
+              background: var(--color-background-overlay); }
+.plate figcaption { display: flex; gap: var(--space-2); margin-top: var(--space-2);
+                    font-size: 12px; }
+.plate-num  { font-family: var(--mono); font-weight: 600; color: var(--color-text-emphasis); }
+
+/* ── 焦點與高對比 ── */
+:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
+@media (forced-colors: active) {
+  .btn, .panel, .table, .nav-item,
+  .field input, .field select, .field textarea, .check, .radio { border: 1px solid ButtonText; }
+  .bg-fixed, .surf::after { display: none; }
+  :focus-visible { outline: 2px solid Highlight; }
+}
+
+/* ── 窄螢幕：漏光半徑與正文欄同為視窗寬度的比例，等比縮放後
+      內容佔比反而變大而伸進漏光。降階以維持正文欄的暗區條件。
+      顆粒強度不隨斷點改變。 ── */
+@media (max-width: 1023px) {
+  .tier-reading    { --leak-a: 6%; --leak-b: 5%; }
+  .tier-structural { --leak-a: 9%; --leak-b: 7%; }
+}
+
+/* ── 高對比偏好：可弱化漏光，但顆粒必須保留 ── */
+@media (prefers-contrast: more) {
+  .tier-reading { --leak-a: 5%; --leak-b: 4%; }
+}
+
+/* ── 列印：停用深色背景與顆粒，改用淺色紙張 ── */
+@media print {
+  .bg-fixed { display: none; }
+  .surf::after { display: none; }
+  html, body { background: #fff; color: #000; }
+  .panel, .table { border-color: #999; }
+}
+
+/* ── 動效降級 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* 只靠 clip-path／transform 的動效沒有 opacity 起始態，
+     限制 transition-property 之後會直接彈出。補一組淡入。 */
+  .anim-reveal { opacity: 0; clip-path: none !important; }
+  .anim-reveal.is-active { opacity: 1; }
+}
+/* ===== BASE END ===== */
+
+/* ── 官網專屬版面。BASE 之外，不影響模板。 ── */
+.site-wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--space-6); }
+.nav { position: sticky; top: 0; z-index: 3; display: flex; align-items: baseline;
+       gap: var(--space-6); padding: var(--space-5) 0;
+       border-bottom: 1px solid var(--color-border-on-dark); }
+.nav-mark { font-family: var(--serif); font-size: 19px; font-weight: 600; letter-spacing: .12em; }
+.nav-links { margin-left: auto; display: flex; gap: var(--space-5); }
+.nav-link { font-family: var(--sans); font-size: 11px; letter-spacing: .28em;
+            text-transform: uppercase; text-decoration: none;
+            color: var(--color-text-muted-on-dark); padding-bottom: 3px;
+            border-bottom: 1px solid transparent; transition: color 150ms cubic-bezier(.2,0,0,1); }
+.nav-link:hover { color: var(--color-text-on-dark); border-bottom-color: var(--color-border-accent); }
+.nav-link[aria-current="true"] { color: var(--color-text-accent); border-bottom-color: var(--color-border-accent); }
+
+.hero { padding: var(--space-16) 0 var(--space-12); }
+.hero-aphorism { font-family: var(--serif); font-size: clamp(38px, 5.4vw, 62px); font-weight: 600;
+                 line-height: 1.18; letter-spacing: .04em; max-width: 22em; }
+.hero-lede { margin-top: var(--space-6); max-width: var(--measure); font-size: 18px; line-height: 1.80;
+             color: var(--color-text-muted-on-dark); }
+/* 規格帶直接接在導言下方，不加分隔線 —— 多一條線會把首屏切成兩塊空區。
+   它是導言的延伸（同一件事的具體數值），不是另一個區段。 */
+.spec-strip { margin-top: var(--space-6); display: flex; flex-wrap: wrap;
+              gap: var(--space-5) var(--space-6); }
+.spec-strip div { font-family: var(--sans); font-size: 11px; letter-spacing: .2em; }
+.spec-strip b { display: block; font-family: var(--mono); font-weight: 400; font-size: 12px;
+                letter-spacing: .1em; color: var(--color-text-on-dark); margin-top: 4px; }
+.spec-strip span { color: var(--color-text-muted-on-dark); text-transform: uppercase; }
+
+.sec { padding: var(--space-12) 0; border-top: 1px solid var(--color-border-on-dark); }
+.sec-num { font-family: var(--mono); font-size: 11px; letter-spacing: .22em;
+           color: var(--color-text-accent); }
+.sec-title { margin-top: var(--space-3); font-size: 30px; font-weight: 600; letter-spacing: .03em; }
+.sec-lede { margin-top: var(--space-4); max-width: var(--measure); color: var(--color-text-muted-on-dark); }
+.sec-body { margin-top: var(--space-8); }
+
+.g2 { display: grid; grid-template-columns: 1.618fr 1fr; gap: var(--space-8); }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+@media (max-width: 900px) { .g2, .g3 { grid-template-columns: 1fr; } }
+
+/* 展示：示範文件縮圖 */
+.shot { margin: 0; }
+.shot a { display: block; text-decoration: none; }
+.shot img { display: block; width: 100%; height: auto;
+            border: 1px solid var(--color-border-on-dark); }
+.shot figcaption { margin-top: var(--space-3); font-size: 13px; letter-spacing: .02em; }
+.shot .kind { display: block; font-family: var(--sans); font-size: 10px; letter-spacing: .28em;
+              text-transform: uppercase; color: var(--color-text-muted-on-dark); margin-bottom: 4px; }
+
+/* 色票 */
+.sw-group { margin-bottom: var(--space-8); }
+.sw-en { margin-left: var(--space-3); color: var(--color-text-muted-on-dark); }
+.sw-row { margin-top: var(--space-4); display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: var(--space-4); }
+.sw { margin: 0; }
+.sw-chip { height: 72px; border: 1px solid var(--color-border-on-dark); }
+.sw figcaption { margin-top: var(--space-2); display: flex; flex-direction: column; gap: 2px; }
+.sw-hex { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; }
+.sw-note { font-size: 12px; color: var(--color-text-muted-on-dark); line-height: 1.5; }
+.sw-luma { font-size: 10px; }
+
+/* 排印階梯 */
+.ty-row { display: grid; grid-template-columns: 132px 1fr 92px; gap: var(--space-5);
+          align-items: baseline; padding: var(--space-4) 0;
+          border-bottom: 1px solid rgb(238 228 213 / 10%); }
+.ty-sample { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 900px) { .ty-row { grid-template-columns: 1fr; } }
+
+/* 母題展示台 */
+.mo { margin: 0; }
+.mo-stage { position: relative; height: 168px; overflow: hidden;
+            border: 1px solid var(--color-border-on-dark);
+            background-color: var(--color-background-base); }
+.mo-stage::after { content: ""; position: absolute; inset: 0; opacity: .10;
+                   background-image: url("../assets/img/grain-200.png"); background-size: 200px 200px; }
+.mo-arc { position: absolute; width: 420px; height: 420px; left: -90px; top: 64px;
+          border: 1px solid var(--color-hairline); border-radius: 50%; }
+.mo-grit { position: absolute; left: 22%; top: 28%; width: 2px; height: 2px; border-radius: 50%;
+           background: var(--color-dust);
+           box-shadow: 44px 22px var(--color-dust), 96px 61px var(--color-dust),
+                       152px 18px var(--color-dust), 187px 88px var(--color-dust),
+                       61px 104px var(--color-dust), 132px 126px var(--color-dust); }
+.mo-stage .ghost { position: absolute; left: var(--space-5); top: 58px; }
+.mo-edge { position: absolute; right: -22px; top: 50%; transform: translateY(-50%) rotate(90deg);
+           font-size: 9px; letter-spacing: .5em; opacity: .3; }
+.mo figcaption { margin-top: var(--space-3); font-size: 13px; }
+.mo-note { display: block; margin-top: 4px; color: var(--color-text-muted-on-dark);
+           font-size: 12px; line-height: 1.55; }
+
+/* 元件展示 */
+.cp { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+.cp-panel { padding: var(--space-5); }
+.cp-panel dt { font-family: var(--sans); font-size: 10px; letter-spacing: .28em;
+               text-transform: uppercase; color: var(--color-text-muted-on-dark); }
+.cp-panel dd { margin: 4px 0 var(--space-4); }
+
+/* 驗收清單 */
+.chk { list-style: none; }
+.chk li { display: grid; grid-template-columns: 26px 1fr; gap: var(--space-3);
+          padding: var(--space-3) 0; border-bottom: 1px solid rgb(238 228 213 / 10%); }
+.chk .n { font-family: var(--mono); font-size: 11px; color: var(--color-text-accent); }
+.chk b { font-weight: 600; }
+.chk span { display: block; margin-top: 3px; font-size: 13px;
+            color: var(--color-text-muted-on-dark); line-height: 1.6; }
+
+/* 問答 */
+.qa { max-width: var(--measure); }
+.qa dt { margin-top: var(--space-6); font-weight: 600; font-size: 18px; }
+.qa dd { margin-top: var(--space-3); color: var(--color-text-muted-on-dark); }
+
+.foot { padding: var(--space-10) 0 var(--space-12); border-top: 1px solid var(--color-border-on-dark);
+        display: flex; flex-wrap: wrap; gap: var(--space-5); justify-content: space-between; }
+.foot a { color: var(--color-text-muted-on-dark); text-decoration: none; }
+.foot a:hover { color: var(--color-text-accent); }
+
+</style>
+</head>
+<body>
+
+<div class="bg-fixed" aria-hidden="true"></div>
+<div class="decor-arc decor-arc--a" aria-hidden="true"></div>
+<div class="decor-arc decor-arc--b" aria-hidden="true"></div>
+<div class="decor-grit" aria-hidden="true"></div>
+<span class="edge-code" aria-hidden="true">KAGE · v0.1 · 2026</span>
+
+<main class="site-wrap">
+
+  <nav class="nav">
+    <span class="nav-mark">影 · kage</span>
+    <div class="nav-links">
+      <a class="nav-link" href="index-develop.html">顯影 / DEVELOP</a>
+      <a class="nav-link" href="index-en.html">EN</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="decor-dash" aria-hidden="true"></div>
+    <h1 class="hero-aphorism" style="margin-top:var(--space-5)">光在畫面外，影在畫面裡。</h1>
+    <p class="hero-lede">「影 · kage」是專為 AI 代理設計的文件生成 skill。給予需求敘述，即自動產出結構完整、視覺排版嚴謹的純螢幕 HTML 文件。系統涵蓋 8 種類型與 2 語軌，共 16 份模板，透過 45 個單一真相來源的色彩 token 與 OFL 授權的 Noto Serif TC 字型，消除數位畫面的過度銳利感。</p>
+    <div class="spec-strip">
+      <div><span>基色</span><b>#000000 → luma 12.8</b></div>
+      <div><span>漏光</span><b>18–30° · 24% / 19%</b></div>
+      <div><span>字型</span><b>Noto Serif TC</b></div>
+      <div><span>顆粒</span><b>SD 7.4</b></div>
+      <div><span>授權</span><b>MIT</b></div>
+    </div>
+  </header>
+
+
+  <section class="sec" id="s00">
+    <p class="sec-num">00 · 展示</p>
+    <h2 class="sec-title">八種類型，每一份都是真實產出</h2>
+    <p class="sec-lede">涵蓋 8 種類型與 2 語軌，共 16 份範例，均為 AI 代理直接產出的 HTML 檔案。</p>
+    <div class="sec-body"><div class="g3">
+      <figure class="shot">
+        <a href="../assets/demos/demo-archive-proposal.html">
+          <img src="../assets/demos/demo-archive-proposal-1280.png" alt="市立文獻館歸檔提案單頁摘要，包含 3 張指標卡片與行動請求欄。">
+        </a>
+        <figcaption><span class="kind">one-pager</span>歸檔效率提高 40%，單頁結構讓高階決策者在 30 秒內完成評估。</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-index-engine.html">
+          <img src="../assets/demos/demo-index-engine-1280.png" alt="離線索引引擎架構決策紀錄，包含執行摘要與 2 欄系統架構圖。">
+        </a>
+        <figcaption><span class="kind">long-doc</span>放棄即時 RPC 改採 100% 離線索引，將檢索延遲穩定控制在 12ms。</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-packaging-equity.html">
+          <img src="../assets/demos/demo-packaging-equity-1280.png" alt="半導體封測公司個股研報，展示目標價、評級與 2 種估值模型。">
+        </a>
+        <figcaption><span class="kind">equity-report</span>先進封裝產能預計 2026 年翻倍，評級上修至買進並給予 35% 溢價目標。</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-document-portfolio.html">
+          <img src="../assets/demos/demo-document-portfolio-1280.png" alt="文件設計作品集，展示 3 個核心案例與量化成效指標。">
+        </a>
+        <figcaption><span class="kind">portfolio</span>重新設計閱讀階梯後，讀者完讀率提升 50% 且跳出率降低 25%。</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-review-notice.html">
+          <img src="../assets/demos/demo-review-notice-1280.png" alt="保存環境覆核通知書信，展示 600 字重襯線署名與單頁格局。">
+        </a>
+        <figcaption><span class="kind">letter</span>相對濕度高於 65% 觸發警告，要求在 7 天內完成空調調校。</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-aperture-changelog.html">
+          <img src="../assets/demos/demo-aperture-changelog-1280.png" alt="離線歸檔工具更新日誌，包含 v2.4.0 版本與 3 個破壞性變更條目。">
+        </a>
+        <figcaption><span class="kind">changelog</span>淘汰舊版 XML 解析器，將大型檔載入記憶體峰值降低 60%。</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-legibility-talk.html">
+          <img src="../assets/demos/demo-legibility-talk-1280.png" alt="靜態檔案長期可讀性演講簡報，展示 16:9 投影片與深色章節頁。">
+        </a>
+        <figcaption><span class="kind">slides</span>拋棄動態 API 轉向純 HTML，確保文件在 30 年後依然可被瀏覽器讀取。</figcaption>
+      </figure>
+      <figure class="shot">
+        <a href="../assets/demos/demo-aperture-site.html">
+          <img src="../assets/demos/demo-aperture-site-1280.png" alt="離線歸檔工具產品落地頁，展示 Hero 區塊與 2 個 CTA 按鈕。">
+        </a>
+        <figcaption><span class="kind">landing-page</span>清晰標明工具類別，上線 1 週內轉換率即提升 18%。</figcaption>
+      </figure>
+    </div>
+    <p class="sec-lede" style="margin-top:var(--space-6)">上述 8 份點擊即可開啟完整 HTML 頁面。模板不依賴外部 CSS 庫，共用區塊在 16 份模板間 100% 逐字一致。</p></div>
+  </section>
+
+
+  <section class="sec" id="s01">
+    <p class="sec-num">01 · 用法</p>
+    <h2 class="sec-title">需求到 HTML 的精準映射</h2>
+    <p class="sec-lede">只需輸入意圖，系統會自動在 1 個指令中分配至 8 種類型之一並選用繁中或英文語軌產出。</p>
+    <div class="sec-body"><div class="g2">
+      <div class="measure"><p>「影 · kage」涵蓋 8 種類型：單頁摘要、長篇報告、個股研報、作品集、商務書信、更新日誌、簡報與產品頁。每種類型皆有獨立的 JSON Schema 內容契約與字數上限，確保 AI 產出的文案結構紮實，不含廢話。</p><p style="margin-top:var(--space-4)">所有 16 份模板均為單檔自包含 HTML，共用 45 個色彩 token 與全域 CSS 樣式。無需編譯器或外部前端框架，生成的檔案可直接在任何現代瀏覽器中開啟或歸檔。</p></div>
+      <aside class="cp-panel surf surf--card"><dl>
+        <dt>輸入意圖</dt><dd>給予 1 段自然語言需求，如「撰寫離線歸檔工具 v2.4.0 更新日誌，包含 3 個重點變更」。</dd>
+        <div class="decor-rule" aria-hidden="true"></div>
+        <dt style="margin-top:var(--space-4)">產出物件</dt><dd>獲得 1 份完整排版的 HTML 文件，內含 16 份模板共通的質感樣式與結構化內容。</dd>
+      </dl></aside>
+    </div></div>
+  </section>
+
+
+  <section class="sec" id="s02">
+    <p class="sec-num">02 · 宣言</p>
+    <h2 class="sec-title">紙張、底片與物理世界</h2>
+    <p class="sec-lede">3 條設計鐵律，重新定義數位文件的質地與精神。</p>
+    <div class="sec-body"><div class="measure">
+      <p class="t-lead">重建物理觸感：畫面不該是純白或死黑，而是由 #000000 堆疊顆粒後產生的 12.8 合成明度。</p>
+      <p class="t-lead" style="margin-top:var(--space-5)">消除數位銳利度：透過 SD 7.4 的無彩顆粒與 18–30° 漏光，給予冷螢幕溫度與雜誌般的沉浸感。</p>
+      <p class="t-lead" style="margin-top:var(--space-5)">克制勝於裝飾：裝飾語彙嚴格限制為 4 種，且弧線與刮痕採 2 選 1 互斥機制。</p>
+    </div></div>
+  </section>
+
+
+  <section class="sec" id="s03">
+    <p class="sec-num">03 · 色彩</p>
+    <h2 class="sec-title">45 個 Token 構成的沉靜調色盤</h2>
+    <p class="sec-lede">全系統共 45 個色彩 token，作為單一真相來源。繪製基色為 #000000，疊加顆粒後合成明度約 12.8。漏光色相鎖定在 18–30° 暖色區段，核心錨定於畫面之外，畫面內僅保留衰減尾端。</p>
+    <div class="sec-body">
+  <div class="sw-group">
+    <p class="t-label t-muted">基底與漏光<span class="sw-en">Base & Leak</span></p>
+    <div class="sw-row">
+      <figure class="sw">
+        <div class="sw-chip" style="background:#000000"></div>
+        <figcaption>
+          <code class="sw-hex">#000000</code>
+          <span class="sw-note">繪製基色。合成後約 luma 12.8</span>
+          <span class="sw-luma decor-num">luma 0.0</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#1a1210"></div>
+        <figcaption>
+          <code class="sw-hex">#1a1210</code>
+          <span class="sw-note">漏光最外緣</span>
+          <span class="sw-luma decor-num">luma 19.6</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#26170f"></div>
+        <figcaption>
+          <code class="sw-hex">#26170f</code>
+          <span class="sw-note">中段</span>
+          <span class="sw-luma decor-num">luma 25.6</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#331c0f"></div>
+        <figcaption>
+          <code class="sw-hex">#331c0f</code>
+          <span class="sw-note">主體</span>
+          <span class="sw-luma decor-num">luma 32.0</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#432513"></div>
+        <figcaption>
+          <code class="sw-hex">#432513</code>
+          <span class="sw-note">邊緣峰值</span>
+          <span class="sw-luma decor-num">luma 42.1</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#683e1d"></div>
+        <figcaption>
+          <code class="sw-hex">#683e1d</code>
+          <span class="sw-note">最亮點，面積 < 0.5%</span>
+          <span class="sw-luma decor-num">luma 68.5</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="sw-group">
+    <p class="t-label t-muted">文字<span class="sw-en">Text</span></p>
+    <div class="sw-row">
+      <figure class="sw">
+        <div class="sw-chip" style="background:#eee4d5"></div>
+        <figcaption>
+          <code class="sw-hex">#eee4d5</code>
+          <span class="sw-note">正文</span>
+          <span class="sw-luma decor-num">luma 229.0</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#bba893"></div>
+        <figcaption>
+          <code class="sw-hex">#bba893</code>
+          <span class="sw-note">次要與中繼資料</span>
+          <span class="sw-luma decor-num">luma 170.5</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#a95d35"></div>
+        <figcaption>
+          <code class="sw-hex">#a95d35</code>
+          <span class="sw-note">強調。24px 以下禁用</span>
+          <span class="sw-luma decor-num">luma 106.3</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="sw-group">
+    <p class="t-label t-muted">表面與材質<span class="sw-en">Surface & Material</span></p>
+    <div class="sw-row">
+      <figure class="sw">
+        <div class="sw-chip" style="background:#29241e"></div>
+        <figcaption>
+          <code class="sw-hex">#29241e</code>
+          <span class="sw-note">深色卡片表面</span>
+          <span class="sw-luma decor-num">luma 36.6</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#e8dfcf"></div>
+        <figcaption>
+          <code class="sw-hex">#e8dfcf</code>
+          <span class="sw-note">淺色紙張，累計面積 ≤ 25%</span>
+          <span class="sw-luma decor-num">luma 223.8</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#d8c8aa"></div>
+        <figcaption>
+          <code class="sw-hex">#d8c8aa</code>
+          <span class="sw-note">書信專用紙色</span>
+          <span class="sw-luma decor-num">luma 201.2</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#424242"></div>
+        <figcaption>
+          <code class="sw-hex">#424242</code>
+          <span class="sw-note">塵點</span>
+          <span class="sw-luma decor-num">luma 66.0</span>
+        </figcaption>
+      </figure>
+      <figure class="sw">
+        <div class="sw-chip" style="background:#56524d"></div>
+        <figcaption>
+          <code class="sw-hex">#56524d</code>
+          <span class="sw-note">刮痕</span>
+          <span class="sw-luma decor-num">luma 82.5</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div></div>
+  </section>
+
+
+  <section class="sec" id="s04">
+    <p class="sec-num">04 · 字體</p>
+    <h2 class="sec-title">襯線體賦予的雜誌印刷感</h2>
+    <p class="sec-lede">採用自架 OFL 授權的 Noto Serif TC，標題與正文全面使用襯線體。無襯線體僅在 3 處承擔功能性標籤：導覽、日期與序號。</p>
+    <div class="sec-body"><div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">display · 64px</span>
+        <p class="t-display ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">大標</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">h1 · 44px</span>
+        <p class="t-h1 ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">章標</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">h2 · 30px</span>
+        <p class="t-h2 ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">節標</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">h3 · 22px</span>
+        <p class="t-h3 ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">小節</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">body-lead · 18px</span>
+        <p class="t-lead ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">導言</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">body · 16px</span>
+        <p class=" ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">正文</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">small · 14px</span>
+        <p class="t-small ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">附註</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">caption · 13px</span>
+        <p class="t-caption ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">圖說</span>
+      </div>
+      <div class="ty-row">
+        <span class="ty-meta decor-num">label · 11px</span>
+        <p class="t-label ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
+        <span class="ty-note t-caption t-muted">標籤</span>
+      </div>
+    </div>
+    <p class="sec-lede" style="margin-top:var(--space-6)">襯線體具備明確的橫豎筆劃對比，在 1280×800 視窗中打破螢幕像素的冰冷感，為文字帶來如實體雜誌般的閱讀節奏。</p></div>
+  </section>
+
+
+  <section class="sec" id="s05">
+    <p class="sec-num">05 · 材質</p>
+    <h2 class="sec-title">4 層堆疊的深邃光影背景</h2>
+    <p class="sec-lede">背景是四層疊加：繪製基色、暖色漏光、可選的中央沉暗層，以及永遠置頂的顆粒。弧線與塵點是裝飾母題，不屬於這四層。</p>
+    <div class="sec-body"><div class="g2">
+      <div class="measure">
+        <p>數位畫面的硬傷在於純色區域的死板與銳利。為了營造實體感，我們使用固定種子產生的 200×200 灰階 PNG 顆粒，疊加後產生標準差 7.4 的無彩雜訊。</p>
+        <p style="margin-top:var(--space-4)">漏光漸層依據 3 類頁面等級調整強度：敘事型最高設為 24%/19%，閱讀型則降至 10%/8%。光源核心始終位於畫面外部，保持中央正文欄明度低於 20。</p>
+      </div>
+      <aside class="cp-panel surf surf--card"><dl>
+        <dt>L1 · 繪製基色</dt><dd>純黑 #000000。這是實際畫下去的顏色，不是你看到的顏色。</dd>
+        <dt>L2 · 暖色漏光</dt><dd>screen 疊加。核心錨定在畫面之外，畫面內只有衰減尾端。</dd>
+        <dt>L3 · 中央沉暗（選用）</dt><dd>只在背景是全幅影像時需要。純色底不需要 —— 中央本來就最暗。</dd>
+        <dt>L4 · 膠片顆粒</dt><dd>normal 混合，永遠最上層。合成後全圖明度約 12.8。</dd>
+      </dl></aside>
+    </div></div>
+  </section>
+
+
+  <section class="sec" id="s06">
+    <p class="sec-num">06 · 母題</p>
+    <h2 class="sec-title">4 種嚴格約束的視覺裝飾語彙</h2>
+    <p class="sec-lede">裝飾語彙包含 4 種：幾何細線與弧線、塵點、鏡像重影與邊緣編目微型字。弧線與斷續刮痕實施 2 選 1 互斥機制，塵點總面積控制在 0.1% 以下，確保視覺元素不干擾閱讀。</p>
+    <div class="sec-body"><div class="g2" style="grid-template-columns:1fr 1fr">
+      <figure class="mo">
+        <div class="mo-stage"><div class="mo-arc" aria-hidden="true"></div></div>
+        <figcaption><span class="decor-num">01</span>幾何細線與弧線<span class="mo-note">1px 大半徑圓弧，不裁切、直接穿出畫面外</span></figcaption>
+      </figure>
+      <figure class="mo">
+        <div class="mo-stage"><div class="mo-grit" aria-hidden="true"></div></div>
+        <figcaption><span class="decor-num">02</span>塵點<span class="mo-note">位置寫死不隨機，合計面積 < 0.1%</span></figcaption>
+      </figure>
+      <figure class="mo">
+        <div class="mo-stage"><span class="ghost t-label t-muted" data-ghost="SPECIMEN">SPECIMEN</span></div>
+        <figcaption><span class="decor-num">03</span>鏡像重影<span class="mo-note">既有英文小標下方的垂直翻轉副本，不新增內容</span></figcaption>
+      </figure>
+      <figure class="mo">
+        <div class="mo-stage"><span class="mo-edge decor-num">KAGE · v0.1 · 2026</span></div>
+        <figcaption><span class="decor-num">04</span>邊緣編目微型字<span class="mo-note">屬材質而非資訊，內容取自頁面既有中繼資料</span></figcaption>
+      </figure></div></div>
+  </section>
+
+
+  <section class="sec" id="s07">
+    <p class="sec-num">07 · 元件</p>
+    <h2 class="sec-title">克制且具備層級感的 UI 模組</h2>
+    <p class="sec-lede">包含按鈕、引言區塊與紙張表面卡片 3 種元件，皆符合 4.5:1 對比度規範。</p>
+    <div class="sec-body"><div class="g2">
+      <div>
+        <div class="cp">
+          <a class="btn btn-primary" href="https://github.com/workingyuanyuan/Kage">查看原始碼<span aria-hidden="true">→</span></a>
+          <a class="btn btn-secondary" href="https://github.com/workingyuanyuan/Kage/blob/main/SKILL.md">閱讀說明</a>
+        </div>
+        <blockquote class="quote" style="margin-top:var(--space-6)">「文字承擔結構，圖像承擔氣氛；克制與秩序才是長遠可讀性的基石。」</blockquote>
+      </div>
+      <aside class="cp-panel surf surf--paper">
+        <p class="t-small">淺色紙張表面累計面積不得超過全頁的 25%，色相維持在 18–30° 暖灰區間。</p>
+      </aside>
+    </div></div>
+  </section>
+
+
+  <section class="sec" id="s08">
+    <p class="sec-num">08 · 驗收</p>
+    <h2 class="sec-title">8 條嚴格可量化的自動檢查點</h2>
+    <p class="sec-lede">建置管線透過腳本自動校驗 8 項視覺物理指標，確保 16 份模板輸出完全符合設計規範。</p>
+    <div class="sec-body"><ol class="chk">
+      <li><span class="n">01</span>
+        <div><b>1. 反向暗角分佈</b><span>畫面中央 20% 區域明度必須低於四周邊緣 10% 區域。</span></div></li>
+      <li><span class="n">02</span>
+        <div><b>2. 邊緣穩定度</b><span>跨截圖邊緣明度波動幅度必須控制在 ±10% 以內。</span></div></li>
+      <li><span class="n">03</span>
+        <div><b>3. 明度面積佔比</b><span>明度 ≥48 佔比 < 4%、≥80 < 0.15%、<32 ≥ 84%。</span></div></li>
+      <li><span class="n">04</span>
+        <div><b>4. 顆粒標準差</b><span>疊加顆粒後明度標準差必須在 6–14 之間，基準值為 7.4。</span></div></li>
+      <li><span class="n">05</span>
+        <div><b>5. 三通道無彩驗證</b><span>RGB 三通道殘差振幅差異必須小於 5%，確保顆粒無彩。</span></div></li>
+      <li><span class="n">06</span>
+        <div><b>6. 乾淨區低頻殘差</b><span>乾淨區域 64/128px 尺度殘差必須小於 0.7，排除低頻斑駁。</span></div></li>
+      <li><span class="n">07</span>
+        <div><b>7. 背景色相區間</b><span>背景色相座標僅能落在 18–30° 暖色或 180–192° 冷灰區。</span></div></li>
+      <li><span class="n">08</span>
+        <div><b>8. 正文欄明度約束</b><span>正文欄低頻明度 p99 ≤ 20 且 p99−p1 ≤ 8，保證閱讀對比。</span></div></li>
+    </ol></div>
+  </section>
+
+
+  <section class="sec" id="s09">
+    <p class="sec-num">09 · 問答</p>
+    <h2 class="sec-title">關於「影 · kage」的常見問題</h2>
+    <p class="sec-lede">解答有關系統定位、生成範疇、美學來源與顯影模式的 4 個核心疑問。</p>
+    <div class="sec-body"><dl class="qa">
+      <dt>1. 「影 · kage」是什麼？</dt><dd>「影 · kage」是一個專門生成美觀 HTML 文件的 AI Agent Skill。它不是產品落地頁產生器，而是一套包含 16 份模板與 45 個色彩 token 的完整文件設計系統。</dd>
+      <dt>2. 「影 · kage」能生成什麼？</dt><dd>支援 8 種類型：單頁摘要、長篇報告、個股研報、作品集、商務書信、更新日誌、簡報與產品頁，繁中與英文雙語軌共 16 份純螢幕 HTML 模板。</dd>
+      <dt>3. 核心美學精神是什麼？</dt><dd>美學源自老底片膠卷與經典電影的物理質感。透過 #000000 基色、7.4 標準差無彩顆粒與 18–30° 邊緣漏光，將數位螢幕的銳利高頻轉化為具備時間沉澱感的雜誌與電影畫面。</dd>
+      <dt>4. 什麼是顯影模式？</dt><dd>顯影模式（develop）是一種冷澈的物理觀察者視角，將主觀宣示轉譯為可觀察的物理紀錄。此模式屬於罕用的可選語域，預設關閉，必須由使用者在需求中明確指定才啟用。</dd>
+    </dl></div>
+  </section>
+
+  <footer class="foot t-meta">
+    <span>影 · kage · 2026 · MIT</span>
+    <span>
+      <a href="https://github.com/workingyuanyuan/Kage">原始碼</a> ·
+      <a href="https://github.com/workingyuanyuan/Kage/blob/main/SKILL.md">說明文件</a> ·
+      <a href="https://github.com/workingyuanyuan/Kage/issues">問題回報</a>
+    </span>
+  </footer>
+
+</main>
+</body>
+</html>

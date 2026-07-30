@@ -1,0 +1,49 @@
+{
+  "product": "Aperture Offline Archiving System",
+  "versions": [
+    {
+      "version": "v1.4.0",
+      "date": "2026-07-30",
+      "summary": "Upgraded index architecture to FlatBuffer columnar format, increasing read/write throughput to 442 MB/s and resolving memory leaks during multi-part archive processing.",
+      "breaking": [
+        {
+          "change": "Changed index structure from v2 B-Tree to v3 FlatBuffer Columnar (.apx extension changed to .apx3); legacy index files cannot be loaded directly.",
+          "migration": "Run aperture-cli migrate --input ./index.apx --output ./index.apx3 to convert index files. Migration of 1,000,000 records takes 2 min 37 sec."
+        }
+      ],
+      "features": [
+        "Refactored underlying I/O module, increasing throughput by 42.8% from 310 MB/s to 442 MB/s.",
+        "Added block-level CRC64 integrity verification, achieving verification speeds of 1.2 GB/s.",
+        "Added multi-part archive progress logging, outputting real-time processed bytes and estimated remaining time."
+      ],
+      "fixes": [
+        "Fixed a memory leak caused by unreleased temporary buffer space during 64 GB multi-part archive operations.",
+        "Fixed index parsing failures occurring when file paths contained special control characters."
+      ]
+    },
+    {
+      "version": "v1.3.0",
+      "date": "2026-04-12",
+      "summary": "Added Zstd compression layer and multi-threaded archiving support, optimizing small-file packaging efficiency.",
+      "features": [
+        "Integrated Zstd compression algorithm, improving compression ratio by 18.5%.",
+        "Added multi-threaded parallel packaging mechanism, supporting up to 32 concurrent tasks."
+      ],
+      "fixes": [
+        "Fixed directory enumeration timeout issues when a single directory exceeds 100,000 files."
+      ]
+    },
+    {
+      "version": "v1.2.0",
+      "date": "2026-01-15",
+      "summary": "Initial release of Aperture Offline Archiving System with v2 B-Tree indexing and multi-part packaging.",
+      "features": [
+        "Implemented v2 B-Tree index structure for fast file retrieval.",
+        "Implemented AES-256-GCM encryption for offline archives."
+      ],
+      "fixes": [
+        "Fixed log writing race conditions under high concurrent load."
+      ]
+    }
+  ]
+}

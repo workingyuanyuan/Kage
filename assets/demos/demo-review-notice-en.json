@@ -1,0 +1,19 @@
+{
+  "sender": "Environmental Audit & Preservation Review Team",
+  "date": "July 30, 2026",
+  "recipient": "Storage & Preservation Management Division 3",
+  "salutation": "To Whom It May Concern:",
+  "subject": "Annual Preservation Environment Audit Results and Remediation Notice for Special Vault",
+  "paragraphs": [
+    "The Environmental Audit Team completed the annual preservation environment inspection for Special Vault Storage Facility 3 in July 2026. Pursuant to the Archival Storage Preservation Standards, the overall structural protection remains compliant; however, measured data indicate that humidity and lighting parameters in specific sectors have exceeded permissible operational limits.",
+    "Regarding atmospheric control, the relative humidity in Sector B was recorded at 64.2% RH, exceeding the maximum allowable threshold of 55.0% RH. Prolonged exposure to elevated humidity increases the risk of organic material degradation and fungal growth. Your division is instructed to calibrate dehumidification units and inspect door seals within 14 days to restore relative humidity below 55.0% RH.",
+    "Regarding illumination, optical monitoring in the main gallery revealed that the UV attenuation rate of explosion-proof fixtures has decreased to 28.5%, with measured illuminance reaching 210 lux against the prescribed maximum of 150 lux. Degradation of protective filter layers accelerates photochemical decay in sensitive artifacts. Your division must complete the replacement of all 48 explosion-proof lighting units and UV filters within 21 days.",
+    "A final re-audit has been scheduled for August 20, 2026, during which our team will perform on-site verification of both corrective measures. Please ensure all remediation work is completed on schedule and submit a corrective action report prior to the re-audit date."
+  ],
+  "signoff": "Sincerely,",
+  "signature": "Sonetto, Lead Auditor",
+  "enclosures": [
+    "Environmental Measurement Data Sheet Ref: KG-LTR-2026-089",
+    "Explosion-Proof Fixture Replacement Technical Guidelines"
+  ]
+}

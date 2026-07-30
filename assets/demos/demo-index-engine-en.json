@@ -1,0 +1,58 @@
+{
+  "title": "Offline Full-Text Index Engine Architecture",
+  "subtitle": "Analysis of data structure selection achieving 85,000 docs/sec write throughput and 4.2 ms P99 query latency.",
+  "author": "Core Search Architecture Committee",
+  "date": "2026-07-30",
+  "summary": {
+    "claim": "Because traditional B+ Tree indexing incurred excessive random I/O and page splits during 100,000,000 offline document ingestion, throughput degraded to 12,000 docs/sec. Therefore, the architecture migrated to LSM-Tree with tiered MemTable and SSTable structures. Because Posting Lists comprised over 60% of storage, Delta Varint was replaced with Roaring Bitmap for chunked compression and SIMD bitwise logic. This refactoring reduced index storage from 48 GB to 14.4 GB (-70.0%), increased write throughput to 85,000 docs/sec (+608.3%), and cut P99 latency from 38.6 ms to 4.2 ms (-89.1%).",
+    "takeaways": [
+      "Because LSM-Tree converts random I/O into sequential disk writes, ingestion throughput increased from 12,000 to 85,000 docs/sec.",
+      "Because Roaring Bitmap uses 16-bit containers and SIMD bitwise AND, compression ratio improved by 70.0%, shrinking storage from 48 GB to 14.4 GB.",
+      "Because Memory-mapped I/O with 64-byte cache line alignment eliminates copy overhead, P99 query latency dropped from 38.6 ms to 4.2 ms.",
+      "Because a Bloom Filter with 10 hash functions caps the false positive rate at 1%, 99% of unnecessary SSTable disk reads were avoided."
+    ]
+  },
+  "chapters": [
+    {
+      "title": "Chapter 1: Background & Offline Index Bottlenecks",
+      "claim": "Because the system must build full-text indexes for 100,000,000 documents (120 GB raw text) within a 4-hour batch window, the existing B+ Tree architecture triggers severe page splits and random I/O, capping write throughput at 12,000 docs/sec.",
+      "paragraphs": [
+        "The legacy architecture used a B+ Tree to manage inverted indexes. When processing 100,000,000 documents (1.2 KB average size, total 120 GB), index nodes suffered frequent random insertions and page splits across 4 KB pages. Measurements indicate that after B+ Tree depth reached 5 levels, disk Read-Before-Write overhead consumed 68% of I/O time. Single-node ingestion throughput dropped precipitously from 45,000 docs/sec to 12,000 docs/sec, extending total index construction time for 120 GB data to 2.3 hours against a 4-hour batch limit.",
+        "On the query side, legacy SkipList inverted lists lacked memory alignment. A multi-term intersection query required traversing DocID arrays exceeding 500,000 elements. Pointer chasing induced an L3 Cache Miss Rate of 42.1%, driving P99 query latency to 38.6 ms. Under a modest 1,000 QPS concurrent load, CPU core utilization hit a saturation ceiling of 94.2%."
+      ]
+    },
+    {
+      "title": "Chapter 2: Architecture Selection & LSM-Tree / Roaring Bitmap Refactoring",
+      "claim": "Because LSM-Tree transforms random writes into sequential 64 MB WAL and MemTable buffers, coupled with Roaring Bitmap 16-bit container chunking and SIMD bitwise processing, the system completely resolves disk I/O bottlenecks and memory cache misalignment.",
+      "paragraphs": [
+        "Phase one of refactoring completely replaced the B+ Tree with an LSM-Tree write engine. Incoming documents write sequentially to a 64 MB Write-Ahead Log (WAL) before in-memory sorting inside a SkipList MemTable. Upon reaching 64 MB, the MemTable freezes and flushes sequentially to L0 SSTable files at 128 MB/s. Empirical data confirms this design reduced random disk write ratio from 84.5% to 0.0%, surging write throughput to 85,000 docs/sec—a 608.3% increase.",
+        "Phase two redesigned the Posting List compression algorithm, replacing Delta Varint with Roaring Bitmaps. Roaring Bitmap splits 32-bit DocIDs into upper 16-bit container keys and lower 16-bit values. Containers holding fewer than 4,096 elements use Array Containers; those above 4,096 use 8 KB Bitmap Containers, while contiguous runs convert to RLE Containers. Executing bitwise AND with AVX-512 SIMD processes 256 bits per cycle, accelerating list intersection by 4.8x and compressing overall index size from 48 GB to 14.4 GB (-70.0%)."
+      ],
+      "figure": {
+        "kind": "Architecture Diagram",
+        "caption": "Dual-layer LSM-Tree and Roaring Bitmap write and query cache pipeline"
+      }
+    },
+    {
+      "title": "Chapter 3: Benchmark Data & Performance Evaluation",
+      "claim": "In rigorous benchmark tests across 100,000,000 real-world documents, the refactored solution demonstrated quantifiable superiority across write throughput, P99 query latency, and memory footprint, fully satisfying production SLA requirements.",
+      "paragraphs": [
+        "To validate performance, the team conducted 3 runs of benchmark tests on 100,000,000 documents (120 GB total) using an 8-core CPU, 32 GB RAM, and NVMe SSD setup. Ingestion throughput jumped from 12,000 docs/sec under the legacy B+ Tree to 85,000 docs/sec (+608.3%), cutting total index build time for 120 GB from 2.3 hours down to 19.6 minutes.",
+        "On the query engine side, leveraging Memory-mapped I/O (mmap) with 64-byte Cache Line alignment and Roaring Bitmap SIMD instructions dropped P99 query latency from 38.6 ms to 4.2 ms (-89.1%). Additionally, LSM-Tree compaction paired with a 10-hash Bloom Filter (1.0% false positive rate) eliminated 99.0% of invalid disk seeks. Total index storage shrank from 48 GB to 14.4 GB (-70.0%), and memory cache footprint decreased from 12.8 GB to 3.8 GB (-70.3%)."
+      ]
+    },
+    {
+      "title": "Chapter 4: Architecture Conclusion & Future Roadmap",
+      "claim": "Because the LSM-Tree and Roaring Bitmap architecture successfully overcame I/O and memory bottlenecks in offline indexing, the system now possesses a foundation to support 1,000,000,000 documents, paving the way for GPU vector acceleration and dynamic tiering.",
+      "paragraphs": [
+        "This architectural refactoring proves that in large-scale offline full-text search, append-only LSM-Tree combined with vector-friendly Roaring Bitmap significantly outperforms traditional B+ Trees. Reducing 120 GB index build time to 19.6 minutes reduces batch maintenance window utilization to just 8.2%, relieving scheduler bottlenecks during data scaling.",
+        "Future roadmap initiatives focus on two areas: First, integrating hybrid AVX-512 and GPU CUDA kernels in Q1 2027 to further optimize Roaring Bitmap multi-term AND/OR evaluation. Second, introducing dynamic hot-cold tiering to archive index data older than 30 days to remote NVMe-oF storage, guaranteeing local SSD footprint remains below 20.0 GB."
+      ]
+    }
+  ],
+  "references": [
+    "O'Neil, P., et al. (1996). The Log-Structured Merge-Tree (LSM-Tree). Acta Informatica, 33(4), 351-385.",
+    "Chambi, S., et al. (2016). Better bitmap performance with Roaring bitmaps. Software: Practice and Experience, 46(5), 709-719.",
+    "Zukowski, M., et al. (2006). Super-Scalar RAM-CPU Cache-Compression Tradeoffs in Large-Scale Information Retrieval. ICDE 2006."
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "title": "Long-Term Legibility of Static Files: Plain-Text Preservation",
+  "subtitle": "Why dependence on runtime layers and proprietary databases leads to irreversible digital asset decay",
+  "audience": "Keynote for Open Source Architecture Conference & Async Engineering Review",
+  "minutes": 20,
+  "slides": [
+    {
+      "layout": "cover",
+      "eyebrow": "KEYNOTE SPEECH",
+      "title": "Long-Term Legibility of Static Files: Plain-Text Preservation",
+      "items": [
+        "Resolution and compatibility maintenance costs",
+        "Serverless architecture asset migration",
+        "Guaranteed long-term access rights"
+      ],
+      "cap": "Presenter: Lucy · July 2026"
+    },
+    {
+      "layout": "content",
+      "eyebrow": "01 ASSET DECAY RISKS",
+      "title": "Structured data trapped in dynamic databases becomes unrecoverable once runtime environments vanish",
+      "items": [
+        "Over 68% of legacy CMS databases cannot export raw semantic content after server shutdown",
+        "Proprietary codecs and binary serialization lose maintainers and execution runtimes within 5 to 10 years",
+        "Raw data lacking self-contained styling and semantics reduces to fragmented bytes"
+      ],
+      "cap": "Source: Digital Preservation Foundation 2025 Software Archeology Survey Report"
+    },
+    {
+      "layout": "content",
+      "eyebrow": "02 SELF-CONTAINED DESIGN",
+      "title": "Self-contained HTML encapsulation guarantees precise rendering across standard browsers for decades",
+      "items": [
+        "Packaging CSS variables and font bases into a single file eliminates external CDN link breakdown risks",
+        "Standard HTML5 semantic tags provide enduring structured markup for future text parsers",
+        "Zero runtime dependencies ensure assets can be previewed and printed directly from any file system"
+      ],
+      "cap": "Intersection of physical print and web standards: Treating web pages as digital printed artifacts"
+    },
+    {
+      "layout": "quote",
+      "eyebrow": "03 CORE PHILOSOPHY",
+      "title": "Legibility depends not on modern authoring tech, but on human readability without tools thirty years later",
+      "items": [
+        "Simplicity is durability",
+        "No vendor lock-in",
+        "Plain text first"
+      ],
+      "cap": "Lucy · Digital Preservation Architecture Thesis"
+    },
+    {
+      "layout": "close",
+      "eyebrow": "04 ACTIONABLE STEPS",
+      "title": "Adopt a static-first distribution pipeline to permanently decouple enduring assets from ephemeral tooling",
+      "items": [
+        "Prioritize self-contained single-file semantic HTML",
+        "Bind textual content directly with visual presentation for archiving",
+        "Perform regular toolless bare-reading audits"
+      ],
+      "cap": "Full talk manuscript and audit tools: https://example.com/legibility-talk"
+    }
+  ]
+}

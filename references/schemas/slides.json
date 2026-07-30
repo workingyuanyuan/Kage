@@ -1,0 +1,66 @@
+{
+  "$comment": "簡報內容契約。盲讀測試：僅依序閱讀標題即可掌握完整論點。每個標題皆為完整陳述句，絕非主題標籤。每頁僅採一種證據形狀。",
+  "type": "object",
+  "required": ["title", "audience", "slides"],
+  "properties": {
+    "title": { "type": "string", "minLength": 2, "maxLength": 80 },
+    "subtitle": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "audience": {
+      "$comment": "聽眾與場合：現場演講、1:1 投資簡報、或非同步分享連結。",
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 160
+    },
+    "minutes": { "type": "integer", "minimum": 1, "maximum": 180 },
+    "slides": {
+      "$comment": "12 頁以上簡報每 4–6 頁需有章節分隔頁與至少一頁引用或數據頁。連續內容頁不超過 5 頁。",
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "required": ["layout", "title"],
+        "properties": {
+          "layout": {
+            "type": "string",
+            "$comment": "kage 的 slides.html 只渲染三種版式：cover 與 close 同走 .slide--title，quote 走 .slide--quote，content 為無修飾內容頁。chapter 與 metrics 沒有對應渲染，不得使用。",
+            "enum": ["cover", "content", "quote", "close"]
+          },
+          "eyebrow": {
+            "$comment": "跨頁章節標籤，絕不換句話重複標題。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "title": {
+            "$comment": "單頁唯一之主張宣告句。",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 110
+          },
+          "items": {
+            "$comment": "3–5 項支撐要點，每項適合單行展示。",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items": { "type": "string", "minLength": 4, "maxLength": 110 }
+          },
+          "chart": {
+            "type": "object",
+            "required": ["kind", "insight"],
+            "properties": {
+              "kind": { "type": "string", "minLength": 2, "maxLength": 40 },
+              "insight": { "type": "string", "minLength": 6, "maxLength": 160 }
+            }
+          },
+          "cap": {
+            "$comment": "該頁重要性補充：取捨、界限、下一步或視覺未盡之洞察。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        }
+      }
+    }
+  }
+}

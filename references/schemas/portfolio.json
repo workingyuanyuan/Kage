@@ -1,0 +1,53 @@
+{
+  "$comment": "作品集內容契約。每個案例皆以問題與利害關係開頭，非個人職責。3–5 個深度案例勝過 12 個淺顯展示。所有結果皆須可量化。",
+  "type": "object",
+  "required": ["name", "positioning", "contact", "about", "projects"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+    "positioning": {
+      "$comment": "封面上的一句話定位。",
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 100
+    },
+    "contact": { "type": "string", "minLength": 4, "maxLength": 160 },
+    "about": { "type": "string", "minLength": 40, "maxLength": 600 },
+    "projects": {
+      "$comment": "每個專案：問題與利害關係優先，明確職責範圍，2–3 項取捨決策，三層結果（指標 + 定性證據 + 商業脈絡）。",
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["title", "kind", "period", "description", "role", "challenge", "outcomes"],
+        "properties": {
+          "title": { "type": "string", "minLength": 2, "maxLength": 60 },
+          "kind": { "type": "string", "minLength": 2, "maxLength": 30 },
+          "period": { "type": "string", "minLength": 2, "maxLength": 30 },
+          "description": { "type": "string", "minLength": 10, "maxLength": 160 },
+          "role": { "type": "string", "minLength": 4, "maxLength": 160 },
+          "challenge": { "type": "string", "minLength": 20, "maxLength": 600 },
+          "outcomes": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 5,
+            "items": { "type": "string", "minLength": 10, "maxLength": 220 }
+          },
+          "images": {
+            "$comment": "真實截圖或照片。缺失圖片標註缺口，絕不用無關圖像替換。",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": { "type": "string", "minLength": 2, "maxLength": 200 }
+          }
+        }
+      }
+    },
+    "more_works": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": { "type": "string", "minLength": 4, "maxLength": 160 }
+    }
+  }
+}

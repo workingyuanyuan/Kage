@@ -1,0 +1,238 @@
+{
+  "$comment": "落地頁內容契約。此為轉化頁面而非宣傳冊：每個元件若不能建立信任，就是在浪費注意力。第一屏必須明確點出真實產品類別。字數目標：繁中 800–1500 字。",
+  "type": "object",
+  "required": [
+    "category",
+    "product_name",
+    "tagline",
+    "facts",
+    "cta",
+    "gallery",
+    "features",
+    "faq"
+  ],
+  "properties": {
+    "category": {
+      "$comment": "真實產品類別：應用程式、CLI、工具、SKILL、模板系統或自訂標籤。",
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 60
+    },
+    "product_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "tagline": {
+      "$comment": "單一文句。若需要逗號則代表太長。",
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 80
+    },
+    "facts": {
+      "$comment": "可快速掃描的證明憑證：價格、平台、退款政策、相容性。不用形容詞。",
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 6,
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 40
+      }
+    },
+    "cta": {
+      "$comment": "次要按鈕 + 主要按鈕。絕不出現第三個按鈕。",
+      "type": "object",
+      "required": [
+        "primary",
+        "secondary"
+      ],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 30
+        },
+        "secondary": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 30
+        }
+      }
+    },
+    "gallery": {
+      "$comment": "2–6 個面板，每張皆為已發布工具或真實狀態之截圖。圖說寫判斷而非行銷詞彙。",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": [
+          "image",
+          "caption"
+        ],
+        "properties": {
+          "image": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200
+          },
+          "caption": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 100
+          }
+        }
+      }
+    },
+    "features": {
+      "$comment": "名稱為工具，副標為比喻，內文用 2–3 句說明價值。",
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "subtitle",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 40
+          },
+          "subtitle": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 60
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 400
+          }
+        }
+      }
+    },
+    "principles": {
+      "$comment": "核心主張列表。標題為承諾，描述為證明。",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "description"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 60
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 260
+          }
+        }
+      }
+    },
+    "pricing": {
+      "$comment": "效益為主標題而非價格。條列效益優先，價格中等字重，行動按鈕不載明價格。",
+      "type": "object",
+      "required": [
+        "price",
+        "benefits"
+      ],
+      "properties": {
+        "benefits": {
+          "$comment": "買家所獲得之效益。單行無換行。",
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 6,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          }
+        },
+        "price": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 30
+        },
+        "comparisons": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "their_price"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              },
+              "their_price": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 30
+              }
+            }
+          }
+        },
+        "terms": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        }
+      }
+    },
+    "faq": {
+      "$comment": "3–8 個真實問答。第一條為定位問題，回答 1–2 句完結。",
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "q",
+          "a"
+        ],
+        "properties": {
+          "q": {
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 120
+          },
+          "a": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 400
+          }
+        }
+      }
+    },
+    "footer": {
+      "type": "object",
+      "required": [
+        "ethos"
+      ],
+      "properties": {
+        "ethos": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 120
+        }
+      }
+    }
+  }
+}

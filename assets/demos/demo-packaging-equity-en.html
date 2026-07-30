@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<!-- ==================================================================
+     影 · kage — EQUITY REPORT (EN)
+     Equity Research / Valuation Analysis / Investment Memo. Screen delivery, no print version.
+     Tier: C Reading (body with .tier-reading)
+     Highest data density, data is the protagonist.
+
+     Spec: references/material.md (Material & Color)
+           references/design.md (Layout & Components)
+     ================================================================== -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apex Packaging Technologies (TWSE: 9988) Equity Research Report</title>
+<meta name="description" content="Capacity expansion in 2.5D/3D advanced packaging and gross margin expansion to 57.2% support BUY rating with Target Price $850.00.">
+<meta name="author" content="Alan Che-Wei Chang / Apex Capital Research">
+<meta name="generator" content="kage">
+<link rel="canonical" href="https://example.com/reports/demo-packaging-equity-en.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Apex Packaging Technologies (TWSE: 9988) Equity Research Report">
+<meta property="og:description" content="Capacity expansion in 2.5D/3D advanced packaging and gross margin expansion to 57.2% support BUY rating with Target Price $850.00.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../fonts/noto-serif-tc/noto-serif-tc.css">
+<style>
+/* ===== BASE BEGIN — 全部模板逐字共用，不得單獨修改 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* 色彩 — 與 references/tokens.json 逐字一致 */
+  --color-accent-primary:         #a95d35;
+  --color-accent-secondary:       #b55829;
+  --color-accent-hover:           #db6f39;
+  --color-accent-pressed:         #7c4120;
+
+  --color-background-base:        #000000;   /* 實際繪製色 */
+  --color-background-global:      #0d0d0d;   /* 疊顆粒後的目標值，不可直接當底色 */
+  --color-background-field-warm:  #0f0f0f;
+  --color-background-field-cool:  #0c0e0f;
+  --color-background-deep:        #050505;
+  --color-background-overlay:     rgb(9 9 9 / 52%);
+
+  --color-leak-1:                 #1a1210;
+  --color-leak-2:                 #26170f;
+  --color-leak-3:                 #331c0f;
+  --color-leak-4:                 #432513;
+  --color-leak-core:              #683e1d;
+  --color-leak-source:            rgb(255 114 29 / 24%);
+
+  --color-tint-cool:              #111516;
+
+  --color-grain:                  rgb(128 128 128 / 10%);
+  --color-dust:                   #424242;
+  --color-scratch:                #56524d;
+  --color-hairline:               rgb(238 228 213 / 11%);
+
+  --color-surface-dark:           #29241e;
+  --color-surface-dark-secondary: #40362c;
+  --color-paper-surface:          #e8dfcf;
+  --color-paper-light:            #f0e8da;
+  --color-paper-letter:           #d8c8aa;
+
+  --color-text-on-dark:           #eee4d5;
+  --color-text-muted-on-dark:     #bba893;
+  --color-text-on-light:          #29241e;
+  --color-text-muted-on-light:    #6f6559;
+
+  --color-text-accent:            #a95d35;
+  --color-text-accent-hover:      #db6f39;
+  --color-text-emphasis:          #7c4120;
+  --color-text-on-accent:         #f0e8da;
+
+  --color-border-accent:          #a95d35;
+  --color-border-on-dark:         rgb(238 228 213 / 32%);
+  --color-border-on-light:        rgb(124 65 32 / 28%);
+
+  --color-link:                   #a95d35;
+  --color-link-hover:             #db6f39;
+  --color-focus-ring:             #db6f39;
+  --color-icon-accent:            #b55829;
+
+  --color-state-success:          #6b7350;
+  --color-state-warning:          #9a7433;
+  --color-state-error:            #9c4a3c;
+  --color-state-info:             #5c6b78;
+
+  /* 間距 */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px;  --space-6: 32px;  --space-8: 48px;  --space-10: 64px;
+  --space-12: 96px; --space-16: 128px;
+
+  /* 字體 */
+  --serif: "Noto Serif TC", "Source Han Serif TC", "Source Han Serif TW",
+           "Songti TC", "PMingLiU", Georgia, serif;
+  --sans:  "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --mono:  ui-monospace, "SF Mono", Consolas, monospace;
+
+  --container: 1200px;
+  --measure:   38em;        /* 正文行寬上限，約 646px */
+
+  /* 漏光光源的 RGB 通道。--color-leak-source 已把 alpha 烘進去，
+     而漏光強度需隨頁型變動，故另存通道三元組供 rgb() 組裝。 */
+  --leak-rgb: 255 114 29;
+
+  /* 漏光強度預設 A 敘事型，由頁型 class 覆寫 */
+  --leak-a: 24%;
+  --leak-b: 19%;
+}
+.tier-structural { --leak-a: 15%; --leak-b: 12%; }
+.tier-reading    { --leak-a: 10%; --leak-b:  8%; }
+
+html { background-color: var(--color-background-base); }
+body {
+  font-family: var(--serif); font-size: 16px; line-height: 1.85;
+  color: var(--color-text-on-dark);
+  -webkit-font-smoothing: antialiased;
+}
+:lang(en) { line-height: 1.70; }
+
+/* ── 背景四層：繪製基色 + 暖色漏光 + 顆粒，全部錨定視窗 ──
+   基色與漏光必須在同一元素的 background stack，background-blend-mode 才生效。
+   漸層水平半徑用 vw 不能用 %（% 無法與長度混入 min()，整條 background-image
+   會靜默退回 none）；垂直半徑維持 % 以對應 visual viewport。            */
+.bg-fixed {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-color: var(--color-background-base);
+  background-image:
+    radial-gradient(ellipse min(55vw, 900px) 90% at 104% 50%,
+                    rgb(var(--leak-rgb) / var(--leak-a)) 0%, rgb(var(--leak-rgb) / 0%) 100%),
+    radial-gradient(ellipse min(45vw, 760px) 70% at -6% 88%,
+                    rgb(var(--leak-rgb) / var(--leak-b)) 0%, rgb(var(--leak-rgb) / 0%) 100%);
+  background-blend-mode: screen;
+}
+.bg-fixed::after {
+  content: ""; position: absolute; inset: 0;
+  opacity: .10;
+  background-image: url("../img/grain-200.png");
+  background-size: 200px 200px;
+  /* 顆粒為靜態材質，不得加入閃爍、位移或任何動畫 */
+}
+main { position: relative; z-index: 1; }
+
+/* ── 局部表面：只有顆粒，不套漏光與中央沉暗構圖 ── */
+.surf { position: relative; }
+.surf > * { position: relative; z-index: 2; }
+.surf::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: .10;
+  background-image: url("../img/grain-200.png");
+  background-size: 200px 200px;
+}
+.surf--card   { background-color: var(--color-surface-dark); }
+.surf--sub    { background-color: var(--color-surface-dark-secondary); }
+.surf--paper  { background-color: var(--color-paper-surface);  color: var(--color-text-on-light); }
+.surf--light  { background-color: var(--color-paper-light);    color: var(--color-text-on-light); }
+.surf--letter { background-color: var(--color-paper-letter);   color: var(--color-text-on-light); }
+.surf--paper::after, .surf--light::after, .surf--letter::after {
+  opacity: .055; mix-blend-mode: multiply;   /* 紙張要讀成纖維而非反光 */
+}
+
+/* ── 排印 ── */
+.t-display { font-size: 64px; font-weight: 600; line-height: 1.10; letter-spacing: .04em; }
+.t-h1      { font-size: 44px; font-weight: 600; line-height: 1.16; letter-spacing: .04em; }
+.t-h2      { font-size: 30px; font-weight: 600; line-height: 1.25; letter-spacing: .03em; }
+.t-h3      { font-size: 22px; font-weight: 600; line-height: 1.35; letter-spacing: .02em; }
+.t-lead    { font-size: 18px; line-height: 1.80; }
+.t-small   { font-size: 14px; line-height: 1.70; }
+.t-caption { font-size: 13px; line-height: 1.65; letter-spacing: .04em; }
+.t-label   { font-family: var(--sans); font-size: 11px; line-height: 1.60;
+             letter-spacing: .28em; text-transform: uppercase; }
+.t-meta    { font-family: var(--sans); font-size: 11px; line-height: 1.60; letter-spacing: .28em; }
+.t-muted   { color: var(--color-text-muted-on-dark); }
+.t-accent  { color: var(--color-text-accent); }
+.t-num     { font-variant-numeric: tabular-nums; }
+
+/* 正文欄：C 級必須置中且不超過 --measure，否則會落進邊緣漸亮區 */
+.measure   { max-width: var(--measure); }
+.tier-reading .measure { margin-inline: auto; }
+:lang(en) .measure { max-width: 60ch; }
+
+/* ── 印刷裝飾：真實元素，純裝飾帶 aria-hidden ── */
+.decor-rule    { height: 1px; background: var(--color-border-on-dark); }
+.decor-dash    { width: 24px; height: 2px; background: var(--color-accent-secondary); }
+.decor-num     { font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+                 color: var(--color-text-muted-on-dark); }
+.decor-corner  { position: absolute; width: 10px; height: 10px;
+                 border-top: 1px solid var(--color-border-on-dark);
+                 border-left: 1px solid var(--color-border-on-dark); }
+.decor-dust    { position: absolute; width: 2px; height: 2px; border-radius: 50%;
+                 background: var(--color-dust); }
+.decor-scratch { position: absolute; width: 1px; opacity: .55;
+                 background: var(--color-scratch); }
+
+/* 幾何細線與弧線：大半徑圓弧，不裁切、直接穿出畫面外。
+   整圈 1px 橢圓只有一小段落在畫面內，讀成一道構圖弧而不是一個圓。 */
+/* fixed 而非 absolute：無定位祖先時 absolute 會落在初始包含塊上，
+   長頁面捲動後裝飾就離開畫面了。這些和顆粒同屬背景材質，一律錨定視窗。 */
+.decor-arc     { position: fixed; pointer-events: none; z-index: 0;
+                 border: 1px solid var(--color-hairline); border-radius: 50%; }
+.decor-arc--a  { width: 120vw; height: 120vw; left: -14vw; top: -64vw; }
+.decor-arc--b  { width:  86vw; height:  86vw; right: -30vw; bottom: -46vw; }
+
+/* 塵點：位置寫死不隨機 —— 隨機會讓每次重載的分布不同，而磨損是靜態材質。
+   面積 12 個 2px 塵點共 48px²，遠低於 1280×800 的 1000px² 預算。
+
+   **不與弧線同時出現斷續刮痕。** 弧線是構圖語彙、刮痕是損傷語彙，兩者的
+   觀感不同，疊在一起會互相抵銷。用了弧線就只配塵點。
+
+   不壓透明度，塵點就是規格寫的 --color-dust。合成 luma 66 略高於天花板
+   標題那個 65，但第 3 條驗收判的是三條面積帶，12 個 2px 塵點共 48px²
+   對任何一帶都無足輕重。刮痕才需要 .55（luma 82.5），那寫在 .decor-scratch。 */
+.decor-grit    { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.decor-grit::before {
+                 content: ""; position: absolute; left: 9%; top: 22%;
+                 width: 2px; height: 2px; border-radius: 50%; background: var(--color-dust);
+                 box-shadow:
+                   14vw  9vh var(--color-dust),  31vw 27vh var(--color-dust),
+                   47vw  4vh var(--color-dust),  56vw 41vh var(--color-dust),
+                   63vw 15vh var(--color-dust),  72vw 33vh var(--color-dust),
+                   19vw 46vh var(--color-dust),  38vw 58vh var(--color-dust),
+                   58vw 66vh var(--color-dust),  77vw 55vh var(--color-dust),
+                   84vw 24vh var(--color-dust),  27vw 71vh var(--color-dust); }
+
+/* 鏡像重影：既有英文小標的處理手法，不新增內容 ——
+   data-ghost 必須與元素本身的文字相同，lint 會檢查兩者是否一致。 */
+.ghost         { position: relative; }
+.ghost::after  { content: attr(data-ghost); position: absolute; left: 0; top: 100%;
+                 transform: scaleY(-1); opacity: .14; pointer-events: none;
+                 -webkit-mask-image: linear-gradient(to bottom, #000, transparent 68%);
+                         mask-image: linear-gradient(to bottom, #000, transparent 68%); }
+
+/* 邊緣編目微型字：屬材質而非資訊，內容取自頁面既有中繼資料，不得杜撰。 */
+.edge-code     { position: fixed; right: var(--space-4); top: 50%; z-index: 0;
+                 transform: translateY(-50%) rotate(90deg); transform-origin: right center;
+                 font-family: var(--sans); font-size: 9px; letter-spacing: .5em;
+                 text-transform: uppercase; pointer-events: none;
+                 color: var(--color-text-muted-on-dark); opacity: .16; }
+
+/* ── 按鈕 ── */
+.btn { display: inline-flex; align-items: center; gap: var(--space-2);
+       padding: 12px 26px; border-radius: 1px; cursor: pointer; text-decoration: none;
+       font-family: var(--sans); font-size: 12px; font-weight: 600;
+       letter-spacing: .16em; text-transform: uppercase;
+       transition: background-color 150ms cubic-bezier(.2,0,0,1),
+                   color 150ms cubic-bezier(.2,0,0,1),
+                   border-color 150ms cubic-bezier(.2,0,0,1),
+                   transform 150ms cubic-bezier(.2,0,0,1); }
+.btn-primary   { background: var(--color-accent-primary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-cta       { background: var(--color-accent-secondary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-secondary { background: transparent; color: var(--color-text-on-dark);
+                 border: 1px solid var(--color-border-accent); }
+/* 標籤走米白而非橘棕：12px 橘棕在邊緣漏光區只有 2.85:1。
+   可操作性由橘棕邊框承擔，仍符合「透明背景 + 細邊框」。 */
+.btn-en        { font-size: 10px; letter-spacing: .24em; opacity: .72; }
+.btn:hover     { transform: translateY(-1px); }
+.btn:active    { transform: translateY(1px); }
+.btn-primary:hover    { background: var(--color-accent-hover); }
+.btn-primary:active   { background: var(--color-accent-pressed); }
+.btn-secondary:hover  { color: var(--color-text-accent-hover);
+                        border-color: var(--color-accent-hover); }
+/* 深色背景上的 Active 不落到 --color-accent-pressed（明度不足） */
+.btn-secondary:active { background: var(--color-accent-primary);
+                        color: var(--color-text-on-accent);
+                        border-color: var(--color-accent-primary); }
+.btn:disabled  { opacity: .4; cursor: not-allowed; pointer-events: none; transform: none; }
+
+.link { color: var(--color-link); text-decoration: none; }
+.link:hover { color: var(--color-link-hover); text-decoration: underline;
+              text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+/* ── 面板與表格 ── */
+.panel      { background: var(--color-surface-dark); padding: var(--space-6);
+              border: 1px solid var(--color-border-on-dark);
+              box-shadow: 0 1px 0 rgb(0 0 0 / 18%); }
+.panel-line { height: 1px; margin: var(--space-4) 0; background: var(--color-border-on-dark); }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table      { width: 100%; border-collapse: collapse;
+              border-top: 2px solid var(--color-border-accent); }
+.table th, .table td { padding: 12px 8px;
+              border-bottom: 1px solid var(--color-border-on-dark); }
+.table th   { text-align: left; font-weight: 400; font-family: var(--sans);
+              font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+              color: var(--color-text-muted-on-dark); }
+.table td   { font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* ── 引用與提示 ── */
+.quote     { display: flex; gap: var(--space-4); margin: 0; padding: 20px 24px;
+              border: 1px solid var(--color-border-on-light); }
+.quote-bar { flex-shrink: 0; width: 3px; background: var(--color-accent-primary); }
+.quote p   { margin: 0; font-size: 16px; line-height: 1.7; }
+.quote cite{ display: block; margin-top: var(--space-2); font-style: normal;
+              font-size: 13px; color: var(--color-text-muted-on-light); }
+.callout   { padding: var(--space-5); border-left: 3px solid var(--color-state-info); }
+.msg       { display: flex; align-items: center; gap: var(--space-2); font-size: 13px; }
+.msg--error   { color: var(--color-state-error); }
+.msg--warning { color: var(--color-state-warning); }
+.msg--success { color: var(--color-state-success); }
+.msg--info    { color: var(--color-state-info); }
+
+/* ── 圖片框架 ── */
+.plate      { margin: 0; padding: 12px; }
+.plate-wrap { position: relative; overflow: hidden; }
+.plate-wrap img { display: block; width: 100%; height: auto; }
+.plate-mask { position: absolute; inset: 0; pointer-events: none;
+              background: var(--color-background-overlay); }
+.plate figcaption { display: flex; gap: var(--space-2); margin-top: var(--space-2);
+                    font-size: 12px; }
+.plate-num  { font-family: var(--mono); font-weight: 600; color: var(--color-text-emphasis); }
+
+/* ── 焦點與高對比 ── */
+:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
+@media (forced-colors: active) {
+  .btn, .panel, .table, .nav-item,
+  .field input, .field select, .field textarea, .check, .radio { border: 1px solid ButtonText; }
+  .bg-fixed, .surf::after { display: none; }
+  :focus-visible { outline: 2px solid Highlight; }
+}
+
+/* ── 窄螢幕：漏光半徑與正文欄同為視窗寬度的比例，等比縮放後
+      內容佔比反而變大而伸進漏光。降階以維持正文欄的暗區條件。
+      顆粒強度不隨斷點改變。 ── */
+@media (max-width: 1023px) {
+  .tier-reading    { --leak-a: 6%; --leak-b: 5%; }
+  .tier-structural { --leak-a: 9%; --leak-b: 7%; }
+}
+
+/* ── 高對比偏好：可弱化漏光，但顆粒必須保留 ── */
+@media (prefers-contrast: more) {
+  .tier-reading { --leak-a: 5%; --leak-b: 4%; }
+}
+
+/* ── 列印：停用深色背景與顆粒，改用淺色紙張 ── */
+@media print {
+  .bg-fixed { display: none; }
+  .surf::after { display: none; }
+  html, body { background: #fff; color: #000; }
+  .panel, .table { border-color: #999; }
+}
+
+/* ── 動效降級 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* 只靠 clip-path／transform 的動效沒有 opacity 起始態，
+     限制 transition-property 之後會直接彈出。補一組淡入。 */
+  .anim-reveal { opacity: 0; clip-path: none !important; }
+  .anim-reveal.is-active { opacity: 1; }
+}
+/* ===== BASE END ===== */
+
+/* 寬資料表在窄螢幕橫向捲動，避免整頁溢出 */
+.table-scroll .table { min-width: 640px; }
+
+/* ===== EQUITY REPORT 專屬版面 ===== */
+.sheet { max-width: var(--container); margin: 0 auto; padding: var(--space-12) var(--space-6); }
+
+.report-header { display: grid; grid-template-columns: 1.618fr 1fr; gap: var(--space-8); align-items: start; padding-bottom: var(--space-6); border-bottom: 2px solid var(--color-border-accent); }
+.report-ticker { font-family: var(--mono); font-size: 12px; letter-spacing: .18em; color: var(--color-text-muted-on-dark); }
+.rating-box { text-align: right; }
+.rating-badge { display: inline-flex; align-items: center; gap: var(--space-2); padding: 6px 14px; border-radius: 1px; font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; }
+.rating-buy { background: var(--color-state-success); color: var(--color-text-on-accent); border: 1px solid var(--color-accent-pressed); }
+.rating-hold { background: var(--color-state-warning); color: var(--color-text-on-accent); border: 1px solid var(--color-accent-pressed); }
+.rating-sell { background: var(--color-state-error); color: var(--color-text-on-accent); border: 1px solid var(--color-accent-pressed); }
+
+.metrics-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); margin-top: var(--space-6); }
+.metric-card { position: relative; padding: var(--space-4); border: 1px solid var(--color-border-on-dark); }
+.metric-card .decor-corner { top: 0; left: 0; }
+.metric-val { font-size: 28px; font-weight: 600; line-height: 1.2; color: var(--color-text-accent); font-variant-numeric: tabular-nums; }
+.metric-lbl { margin-top: var(--space-1); color: var(--color-text-muted-on-dark); font-family: var(--sans); font-size: 11px; letter-spacing: .15em; }
+
+.report-section { margin-top: var(--space-10); }
+.section-title-wrap { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); padding-bottom: var(--space-2); border-bottom: 1px solid var(--color-border-on-dark); }
+
+/* C 級正文欄須相對視窗置中 */
+.thesis-grid { display: grid; grid-template-columns: minmax(0, var(--measure)) 1fr;
+               justify-content: center; gap: var(--space-8); margin-top: var(--space-6); align-items: start; }
+.catalysts-risks-grid { display: grid; grid-template-columns: 1.618fr 1fr; gap: var(--space-8); margin-top: var(--space-6); align-items: start; }
+
+.table-section { margin-top: var(--space-8); }
+.table-caption { font-family: var(--sans); font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--color-text-muted-on-dark); margin-bottom: var(--space-3); }
+
+.disclaimer-paper { margin-top: var(--space-10); padding: var(--space-6); border: 1px solid var(--color-border-on-light); }
+
+.colophon { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-12); padding-top: var(--space-5); border-top: 1px solid var(--color-border-on-dark); color: var(--color-text-muted-on-dark); }
+
+@media (max-width: 1023px) {
+  .report-header, .thesis-grid, .catalysts-risks-grid { grid-template-columns: 1fr; }
+  .rating-box { text-align: left; margin-top: var(--space-4); }
+  .metrics-strip { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 767px) {
+  .sheet { padding: var(--space-8) var(--space-4); }
+  .metrics-strip { grid-template-columns: 1fr; }
+  .metric-val { font-size: 24px; }
+  .disclaimer-paper { padding: var(--space-4); }
+}
+</style>
+</head>
+<body class="tier-reading">
+
+<div class="bg-fixed" aria-hidden="true"></div>
+<!-- 邊緣編目微型字：屬材質而非資訊，內容取自本頁既有中繼資料，不得杜撰 -->
+<span class="edge-code" aria-hidden="true">TWSE: 9988 · 2026-07-28</span>
+
+<main class="sheet">
+
+  <header class="report-header">
+    <div>
+      <div class="decor-dash" aria-hidden="true"></div>
+      <div class="report-ticker">TWSE: 9988 · Semiconductor Packaging & Testing</div>
+      <h1 class="t-h1" style="margin-top:var(--space-2)">
+        Apex Packaging Technologies Inc.<span class="en" style="display:block; margin-top:var(--space-1); font-family:var(--sans); font-size:13px; letter-spacing:.30em; text-transform:uppercase; color:var(--color-text-muted-on-dark)">Apex Packaging Technologies Inc.</span>
+      </h1>
+      <p class="t-lead t-muted" style="margin-top:var(--space-3)">Advanced packaging capacity at full utilization, positioning 2026E revenue and earnings for doubling</p>
+    </div>
+
+    <div class="rating-box">
+      <div class="t-meta t-muted" style="margin-bottom:var(--space-2)">2026-07-28 · Apex Capital Research</div>
+      <div style="margin-bottom:var(--space-3)">
+        <span class="rating-badge rating-buy">
+          <span class="decor-num" style="color:var(--color-text-on-accent)" aria-hidden="true">RATING:</span>
+          BUY
+        </span>
+      </div>
+      <div class="t-meta">
+        <div><span class="t-muted">Target Price:</span> <span class="t-num" style="font-size:16px; font-weight:600; border-bottom:2px solid var(--color-accent-primary); padding-bottom:2px">NT$ 850.00</span></div>
+        <div><span class="t-muted">Current Price:</span> <span class="t-num" style="font-size:14px">NT$ 620.00</span></div>
+        <div><span class="t-muted">Upside:</span> <span class="t-num" style="color:var(--color-text-on-dark)">+37.1%</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="metrics-strip">
+    <div class="metric-card surf surf--card">
+      <span class="decor-corner" aria-hidden="true"></span>
+      <div class="metric-val t-num">NT$ 850</div>
+      <div class="metric-lbl">Target Price (TP)</div>
+    </div>
+    <div class="metric-card surf surf--card">
+      <span class="decor-corner" aria-hidden="true"></span>
+      <div class="metric-val t-num">+37.1%</div>
+      <div class="metric-lbl">Implied Upside</div>
+    </div>
+    <div class="metric-card surf surf--card">
+      <span class="decor-corner" aria-hidden="true"></span>
+      <div class="metric-val t-num">NT$ 347B</div>
+      <div class="metric-lbl">Market Cap</div>
+    </div>
+    <div class="metric-card surf surf--card">
+      <span class="decor-corner" aria-hidden="true"></span>
+      <div class="metric-val t-num">12.2x</div>
+      <div class="metric-lbl">2026E P/E Ratio</div>
+    </div>
+  </section>
+
+  <section class="report-section">
+    <div class="section-title-wrap">
+      <h2 class="t-h2">Investment Thesis</h2>
+      <span class="en t-label" style="color:var(--color-text-muted-on-dark)">INVESTMENT THESIS</span>
+    </div>
+    <div class="thesis-grid">
+      <div class="measure">
+        <p class="t-body">Advanced 2.5D/3D semiconductor packaging capacity utilization is projected to reach 94% in 2026E, driving revenue up 30.8% YoY to NT$ 89,500M. The demand surge in HPC chips utilizing CoWoS-like architecture, with bonding yields reaching 92.5%, reinforces high-margin order dominance.</p>
+        <p class="t-body" style="margin-top:var(--space-4)">High-margin advanced packaging revenue share rises from 38% in 2024 to 57% in 2026E, expanding overall gross margin by 5.7 ppt to 57.2%. Following Q3 qualification of proprietary silicon interposers, unit bill-of-materials costs decrease by 14.2%, driving structural profitability enhancement.</p>
+        <p class="t-body" style="margin-top:var(--space-4)">Free cash flow turns positive in 2025E to NT$ 12,400M as capex normalizes from 45% of revenue to 26%. A robust balance sheet supports sustained R&D. We project 2026E EPS of NT$ 51.00, implying a 12.2x P/E ratio versus peer average of 19.5x, offering significant rerating upside.</p>
+      </div>
+
+      <aside class="aside panel surf surf--card">
+        <span class="decor-num">SUMMARY</span>
+        <h3 class="t-h3" style="font-size:16px; margin-top:var(--space-2)">Executive Summary</h3>
+        <div class="panel-line" aria-hidden="true"></div>
+        <dl style="font-size:14px">
+          <dt class="t-label t-muted">Rating Action</dt>
+          <dd style="margin-bottom:var(--space-3)" class="t-num">Initiating Coverage - BUY</dd>
+          <dt class="t-label t-muted">Valuation Basis</dt>
+          <dd style="margin-bottom:var(--space-3)" class="t-num">2026E EPS x 16.7x P/E</dd>
+          <dt class="t-label t-muted">Key Drivers</dt>
+          <dd class="t-num">AI chip packaging demand CAGR 42%</dd>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="report-section">
+    <figure class="plate surf surf--paper">
+      <div class="plate-wrap">
+        <img src="../img/demo/pe-band.png" alt="2021 至 2026E 歷史本益比區間與現價位置">
+      </div>
+      <figcaption>
+        <span class="plate-num">FIG. 01</span>Figure 1: Current price at 12.2x P/E sits at the bottom of the historical valuation band (12x–22x), offering strong margin of safety
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="report-section">
+    <div class="section-title-wrap">
+      <h2 class="t-h2">Financial Summary & Valuation Models</h2>
+      <span class="en t-label" style="color:var(--color-text-muted-on-dark)">FINANCIAL & VALUATION TABLES</span>
+    </div>
+
+    <div class="table-section">
+      <p class="table-caption">Table 1: Income Statement & Key Financial Projections (in NT$ M / EPS in NT$)</p>
+      <div class="table-scroll">
+<table class="table">
+        <thead>
+          <tr>
+            <th>Financial Metrics</th>
+            <th style="text-align:right">2023</th>
+            <th style="text-align:right">2024</th>
+            <th style="text-align:right">2025E</th>
+            <th style="text-align:right">2026E</th>
+            <th style="text-align:right">YoY (26E)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Revenue</td>
+            <td style="text-align:right" class="t-num">42,850</td>
+            <td style="text-align:right" class="t-num">51,200</td>
+            <td style="text-align:right" class="t-num">68,400</td>
+            <td style="text-align:right" class="t-num">89,500</td>
+            <td style="text-align:right" class="t-num" style="color:var(--color-text-on-dark)">+30.8%</td>
+          </tr>
+          <tr>
+            <td>Gross Margin (%)</td>
+            <td style="text-align:right" class="t-num">48.2%</td>
+            <td style="text-align:right" class="t-num">51.5%</td>
+            <td style="text-align:right" class="t-num">54.8%</td>
+            <td style="text-align:right" class="t-num">57.2%</td>
+            <td style="text-align:right" class="t-num">+2.4 ppt</td>
+          </tr>
+          <tr>
+            <td>Operating Income (EBIT)</td>
+            <td style="text-align:right" class="t-num">12,400</td>
+            <td style="text-align:right" class="t-num">16,800</td>
+            <td style="text-align:right" class="t-num">24,600</td>
+            <td style="text-align:right" class="t-num">34,200</td>
+            <td style="text-align:right" class="t-num">+39.0%</td>
+          </tr>
+          <tr>
+            <td>Net Income</td>
+            <td style="text-align:right" class="t-num">10,100</td>
+            <td style="text-align:right" class="t-num">13,900</td>
+            <td style="text-align:right" class="t-num">20,400</td>
+            <td style="text-align:right" class="t-num">28,600</td>
+            <td style="text-align:right" class="t-num">+40.2%</td>
+          </tr>
+          <tr>
+            <td>Earnings Per Share (EPS)</td>
+            <td style="text-align:right" class="t-num" style="font-weight:600">18.20</td>
+            <td style="text-align:right" class="t-num" style="font-weight:600">24.80</td>
+            <td style="text-align:right" class="t-num" style="font-weight:600">36.40</td>
+            <td style="text-align:right" class="t-num" style="font-weight:600; color:var(--color-text-on-dark)">51.00</td>
+            <td style="text-align:right" class="t-num">+40.1%</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <p class="table-caption">Table 2: Global Peer Group Valuation</p>
+      <div class="table-scroll">
+<table class="table">
+        <thead>
+          <tr>
+            <th>Company Name</th>
+            <th>Exchange / Ticker</th>
+            <th style="text-align:right">Market Cap</th>
+            <th style="text-align:right">2025E P/E</th>
+            <th style="text-align:right">2026E P/E</th>
+            <th style="text-align:right">2026E ROE</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600; color:var(--color-text-on-dark)">Apex Packaging (Subject)</td>
+            <td class="t-num">TWSE: 9988</td>
+            <td style="text-align:right" class="t-num">US$ 10.8B</td>
+            <td style="text-align:right" class="t-num">17.0x</td>
+            <td style="text-align:right" class="t-num" style="font-weight:600">12.2x</td>
+            <td style="text-align:right" class="t-num">29.5%</td>
+          </tr>
+          <tr>
+            <td>SiliconEdge Corp</td>
+            <td class="t-num">NASDAQ: SECP</td>
+            <td style="text-align:right" class="t-num">US$ 45.2B</td>
+            <td style="text-align:right" class="t-num">32.5x</td>
+            <td style="text-align:right" class="t-num">24.4x</td>
+            <td style="text-align:right" class="t-num">38.2%</td>
+          </tr>
+          <tr>
+            <td>MicroLink Semi</td>
+            <td class="t-num">KRX: 098820</td>
+            <td style="text-align:right" class="t-num">US$ 14.5B</td>
+            <td style="text-align:right" class="t-num">18.2x</td>
+            <td style="text-align:right" class="t-num">14.8x</td>
+            <td style="text-align:right" class="t-num">21.0%</td>
+          </tr>
+          <tr>
+            <td style="font-style:italic">Peer Average</td>
+            <td>-</td>
+            <td style="text-align:right" class="t-num">-</td>
+            <td style="text-align:right" class="t-num">25.3x</td>
+            <td style="text-align:right" class="t-num">19.6x</td>
+            <td style="text-align:right" class="t-num">29.6%</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <p class="table-caption">Table 3: Target Price Sensitivity Matrix to 2026E P/E and EPS (NT$)</p>
+      <div class="table-scroll">
+<table class="table">
+        <thead>
+          <tr>
+            <th>2026E P/E \ EPS</th>
+            <th style="text-align:right">NT$ 45.0</th>
+            <th style="text-align:right">NT$ 48.0</th>
+            <th style="text-align:right">NT$ 51.0 (Base)</th>
+            <th style="text-align:right">NT$ 54.0</th>
+            <th style="text-align:right">NT$ 57.0</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>14.0x</td>
+            <td style="text-align:right" class="t-num">630</td>
+            <td style="text-align:right" class="t-num">672</td>
+            <td style="text-align:right" class="t-num">714</td>
+            <td style="text-align:right" class="t-num">756</td>
+            <td style="text-align:right" class="t-num">798</td>
+          </tr>
+          <tr>
+            <td>16.7x (Target Multiple)</td>
+            <td style="text-align:right" class="t-num">752</td>
+            <td style="text-align:right" class="t-num">802</td>
+            <td style="text-align:right" class="t-num" style="font-weight:600; color:var(--color-text-on-dark)">850 (Target Price)</td>
+            <td style="text-align:right" class="t-num">902</td>
+            <td style="text-align:right" class="t-num">952</td>
+          </tr>
+          <tr>
+            <td>19.0x</td>
+            <td style="text-align:right" class="t-num">855</td>
+            <td style="text-align:right" class="t-num">912</td>
+            <td style="text-align:right" class="t-num">969</td>
+            <td style="text-align:right" class="t-num">1,026</td>
+            <td style="text-align:right" class="t-num">1,083</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="report-section">
+    <div class="section-title-wrap">
+      <h2 class="t-h2">Catalysts & Investment Risks</h2>
+      <span class="en t-label" style="color:var(--color-text-muted-on-dark)">CATALYSTS & RISKS</span>
+    </div>
+    <div class="catalysts-risks-grid">
+      <div>
+        <h3 class="t-h3">Key Stock Price Catalysts</h3>
+        <div style="margin-top:var(--space-4)">
+          <div style="margin-bottom:var(--space-4)">
+            <div class="t-label t-muted">Catalyst 01</div>
+            <p class="t-body" style="font-weight:600; margin-top:var(--space-1)">Accelerated Next-Gen Chip Mass Production Timeline</p>
+            <p class="t-small t-muted" style="margin-top:var(--space-1)">H2 customer pull momentum exceeds expectations; yields surpassing 85% will boost gross margin by 2.4 ppt.</p>
+          </div>
+          <div style="margin-bottom:var(--space-4)">
+            <div class="t-label t-muted">Catalyst 02</div>
+            <p class="t-body" style="font-weight:600; margin-top:var(--space-1)">Expanded Orders from North American Data Center Clients</p>
+            <p class="t-small t-muted" style="margin-top:var(--space-1)">CSP capex upward revisions lock in production capacity for the next two years.</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel surf surf--card">
+        <span class="decor-num">RISK ASSESSMENT</span>
+        <h3 class="t-h3" style="font-size:16px; margin-top:var(--space-2)">Key Downside Risks</h3>
+        <div class="panel-line" aria-hidden="true"></div>
+        <div style="font-size:13px; color:var(--color-text-muted-on-dark)">
+          <p style="margin-bottom:var(--space-3)"><strong style="color:var(--color-text-on-dark)">1. Geopolitical & Export Controls:</strong> Tech regulations restricting shipment schedules in specific markets could impact 2026E revenue by 5% to 8%.</p>
+          <p style="margin-bottom:var(--space-3)"><strong style="color:var(--color-text-on-dark)">2. Upstream Material Price Volatility:</strong> A 10% increase in rare metal and substrate costs compresses operating margin by 1.2 ppt.</p>
+          <p><strong style="color:var(--color-text-on-dark)">3. Macro Demand Softness:</strong> Slower-than-expected consumer electronics recovery dampening mature node capacity utilization, reducing EPS by NT$ 1.50.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="disclaimer-paper surf surf--letter">
+    <div class="t-label" style="color:var(--color-text-muted-on-light); margin-bottom:var(--space-2)">DISCLAIMER & DISCLOSURES</div>
+    <h3 class="t-h3" style="font-size:16px; color:var(--color-text-on-light); margin-bottom:var(--space-2)">Analyst Certification & Research Disclaimer</h3>
+    <p class="t-caption" style="color:var(--color-text-muted-on-light); line-height:1.6">
+      The information contained in this research report is for reference purposes only and does not constitute an offer, solicitation, invitation, inducement, or legal commitment of any kind. Apex Capital Research and the analyst have exercised reasonable efforts to ensure accuracy and completeness, but make no warranty, express or implied, regarding timeliness or completeness. Investors should independently evaluate investment risks and assume full responsibility for outcomes.
+    </p>
+  </section>
+
+  <footer class="colophon t-meta">
+    <span>Apex Capital Research · 2026-07-28</span>
+    <span class="decor-num">REP-2026-9988-APEX</span>
+  </footer>
+
+</main>
+</body>
+</html>

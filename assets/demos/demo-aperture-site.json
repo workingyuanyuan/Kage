@@ -1,0 +1,61 @@
+{
+  "category": "CLI 靜態資產處理工具",
+  "product_name": "Aperture",
+  "tagline": "單檔零依賴的網頁靜態資產編譯與效能管線",
+  "facts": [
+    "v2.4.0 穩定版",
+    "MIT 自由軟體授權",
+    "支援 macOS / Linux / Windows",
+    "零外部執行時依賴"
+  ],
+  "cta": {
+    "primary": "下載 CLI 工具",
+    "secondary": "閱讀完整文件"
+  },
+  "gallery": [
+    {
+      "image": "../img/grain-200.png",
+      "caption": "編譯管線耗時少於 12ms，比對分析與死碼剪裁差異一目了然"
+    },
+    {
+      "image": "../img/grain-200.png",
+      "caption": "離線視覺材質烘焙面板，精確控制背景顆粒與光影疊加強度"
+    }
+  ],
+  "features": [
+    {
+      "name": "資產樹極致剪裁",
+      "subtitle": "零殘留死碼削減",
+      "description": "自動分析 DOM 結構與 CSS 選擇器使用率，精確移除未使用的規則與排印樣式，顯著降低打包體積。"
+    },
+    {
+      "name": "靜態顆粒與材質烘焙",
+      "subtitle": "離線光影繪製機",
+      "description": "將底層視覺質感直接合成至 HTML 背景圖層，避免前端執行時即時運算造成的影格掉幀與資源浪費。"
+    },
+    {
+      "name": "嚴格內容契約驗證",
+      "subtitle": "欄位長度與型別守門人",
+      "description": "在構建階段透過 JSON Schema 自動檢查所有欄位長度與結構，確保產出的靜態文件無缺失或長度溢出。"
+    },
+    {
+      "name": "多語系獨立束化",
+      "subtitle": "靜態語系分流引擎",
+      "description": "依據語言設定自動注入相對應的排印參數與字符寬度設定，確保拉丁文與漢字排版皆獲得最佳閱讀經驗。"
+    }
+  ],
+  "faq": [
+    {
+      "q": "Aperture 與一般的網頁打包工具（如 Vite 或 Webpack）有何不同？",
+      "a": "Aperture 專注於生成自包含、不可變且具備實體質感的靜態文件。它不注入任何 JavaScript 框架執行時，而是直接將語意、排版與靜態材質編譯為單一 HTML 檔案。"
+    },
+    {
+      "q": "使用 Aperture 編譯出的檔案是否可以在無網路環境下閱讀？",
+      "a": "是的。所有字體、材質與樣式均可採用本地路徑或 Base64 內嵌，產出的 HTML 檔案可直接在本地硬碟點擊開啟，三十年後仍能精確重現。"
+    },
+    {
+      "q": "如何將 Aperture 整合至既有的 CI/CD 自動化管線？",
+      "a": "Aperture 提供標準 CLI 命令列介面與 Node.js API，單一指令 aperture compile 即可完成驗證與打包，回傳 exit code 0/1 方便 CI 檢查。"
+    }
+  ]
+}

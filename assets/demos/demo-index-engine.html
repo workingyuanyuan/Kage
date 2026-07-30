@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<!-- ==================================================================
+     影 · kage — LONG-DOC（繁中）
+     長篇文件 / 白皮書 / 年度總結。螢幕交付，長文閱讀。
+     頁型分級：C 閱讀型（body 帶 .tier-reading）
+
+     規格：references/material.md（材質與色彩）
+           references/design.md（版面與元件）
+     ================================================================== -->
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>離線全文索引引擎架構決策紀錄</title>
+<meta name="description" content="因為傳統 B+ Tree 在處理 100,000,000 筆離線文件寫入時引發過度的隨機 I/O 與頁面分割，導致寫入吞吐量崩潰至 12,000 docs/sec，所以本架構全面轉向 LSM-Tree 搭配 MemTable 與 SSTable 的分層儲存結構。重構使索引體積由 48 GB 縮減至 14.4 GB（降幅 70.0%），寫入吞吐量提升至 85,000 docs/sec（提升 608.3%），P99 查詢延遲由 38.6 ms 降至 4.2 ms（降低 89.1%）。">
+<meta name="author" content="核心搜尋架構委員會">
+<meta name="generator" content="kage">
+<link rel="canonical" href="https://arch.internal/docs/index-engine">
+<meta property="og:type" content="article">
+<meta property="og:title" content="離線全文索引引擎架構決策紀錄">
+<meta property="og:description" content="因為傳統 B+ Tree 在處理 100,000,000 筆離線文件寫入時引發過度的隨機 I/O 與頁面分割，導致寫入吞吐量崩潰至 12,000 docs/sec，所以本架構全面轉向 LSM-Tree 搭配 MemTable 與 SSTable 的分層儲存結構。重構使索引體積由 48 GB 縮減至 14.4 GB（降幅 70.0%），寫入吞吐量提升至 85,000 docs/sec（提升 608.3%），P99 查詢延遲由 38.6 ms 降至 4.2 ms（降低 89.1%）。">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../fonts/noto-serif-tc/noto-serif-tc.css">
+<style>
+/* ===== BASE BEGIN — 全部模板逐字共用，不得單獨修改 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* 色彩 — 與 references/tokens.json 逐字一致 */
+  --color-accent-primary:         #a95d35;
+  --color-accent-secondary:       #b55829;
+  --color-accent-hover:           #db6f39;
+  --color-accent-pressed:         #7c4120;
+
+  --color-background-base:        #000000;   /* 實際繪製色 */
+  --color-background-global:      #0d0d0d;   /* 疊顆粒後的目標值，不可直接當底色 */
+  --color-background-field-warm:  #0f0f0f;
+  --color-background-field-cool:  #0c0e0f;
+  --color-background-deep:        #050505;
+  --color-background-overlay:     rgb(9 9 9 / 52%);
+
+  --color-leak-1:                 #1a1210;
+  --color-leak-2:                 #26170f;
+  --color-leak-3:                 #331c0f;
+  --color-leak-4:                 #432513;
+  --color-leak-core:              #683e1d;
+  --color-leak-source:            rgb(255 114 29 / 24%);
+
+  --color-tint-cool:              #111516;
+
+  --color-grain:                  rgb(128 128 128 / 10%);
+  --color-dust:                   #424242;
+  --color-scratch:                #56524d;
+  --color-hairline:               rgb(238 228 213 / 11%);
+
+  --color-surface-dark:           #29241e;
+  --color-surface-dark-secondary: #40362c;
+  --color-paper-surface:          #e8dfcf;
+  --color-paper-light:            #f0e8da;
+  --color-paper-letter:           #d8c8aa;
+
+  --color-text-on-dark:           #eee4d5;
+  --color-text-muted-on-dark:     #bba893;
+  --color-text-on-light:          #29241e;
+  --color-text-muted-on-light:    #6f6559;
+
+  --color-text-accent:            #a95d35;
+  --color-text-accent-hover:      #db6f39;
+  --color-text-emphasis:          #7c4120;
+  --color-text-on-accent:         #f0e8da;
+
+  --color-border-accent:          #a95d35;
+  --color-border-on-dark:         rgb(238 228 213 / 32%);
+  --color-border-on-light:        rgb(124 65 32 / 28%);
+
+  --color-link:                   #a95d35;
+  --color-link-hover:             #db6f39;
+  --color-focus-ring:             #db6f39;
+  --color-icon-accent:            #b55829;
+
+  --color-state-success:          #6b7350;
+  --color-state-warning:          #9a7433;
+  --color-state-error:            #9c4a3c;
+  --color-state-info:             #5c6b78;
+
+  /* 間距 */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px;  --space-6: 32px;  --space-8: 48px;  --space-10: 64px;
+  --space-12: 96px; --space-16: 128px;
+
+  /* 字體 */
+  --serif: "Noto Serif TC", "Source Han Serif TC", "Source Han Serif TW",
+           "Songti TC", "PMingLiU", Georgia, serif;
+  --sans:  "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --mono:  ui-monospace, "SF Mono", Consolas, monospace;
+
+  --container: 1200px;
+  --measure:   38em;        /* 正文行寬上限，約 646px */
+
+  /* 漏光光源的 RGB 通道。--color-leak-source 已把 alpha 烘進去，
+     而漏光強度需隨頁型變動，故另存通道三元組供 rgb() 組裝。 */
+  --leak-rgb: 255 114 29;
+
+  /* 漏光強度預設 A 敘事型，由頁型 class 覆寫 */
+  --leak-a: 24%;
+  --leak-b: 19%;
+}
+.tier-structural { --leak-a: 15%; --leak-b: 12%; }
+.tier-reading    { --leak-a: 10%; --leak-b:  8%; }
+
+html { background-color: var(--color-background-base); }
+body {
+  font-family: var(--serif); font-size: 16px; line-height: 1.85;
+  color: var(--color-text-on-dark);
+  -webkit-font-smoothing: antialiased;
+}
+:lang(en) { line-height: 1.70; }
+
+/* ── 背景四層：繪製基色 + 暖色漏光 + 顆粒，全部錨定視窗 ──
+   基色與漏光必須在同一元素的 background stack，background-blend-mode 才生效。
+   漸層水平半徑用 vw 不能用 %（% 無法與長度混入 min()，整條 background-image
+   會靜默退回 none）；垂直半徑維持 % 以對應 visual viewport。            */
+.bg-fixed {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-color: var(--color-background-base);
+  background-image:
+    radial-gradient(ellipse min(55vw, 900px) 90% at 104% 50%,
+                    rgb(var(--leak-rgb) / var(--leak-a)) 0%, rgb(var(--leak-rgb) / 0%) 100%),
+    radial-gradient(ellipse min(45vw, 760px) 70% at -6% 88%,
+                    rgb(var(--leak-rgb) / var(--leak-b)) 0%, rgb(var(--leak-rgb) / 0%) 100%);
+  background-blend-mode: screen;
+}
+.bg-fixed::after {
+  content: ""; position: absolute; inset: 0;
+  opacity: .10;
+  background-image: url("../img/grain-200.png");
+  background-size: 200px 200px;
+  /* 顆粒為靜態材質，不得加入閃爍、位移或任何動畫 */
+}
+main { position: relative; z-index: 1; }
+
+/* ── 局部表面：只有顆粒，不套漏光與中央沉暗構圖 ── */
+.surf { position: relative; }
+.surf > * { position: relative; z-index: 2; }
+.surf::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: .10;
+  background-image: url("../img/grain-200.png");
+  background-size: 200px 200px;
+}
+.surf--card   { background-color: var(--color-surface-dark); }
+.surf--sub    { background-color: var(--color-surface-dark-secondary); }
+.surf--paper  { background-color: var(--color-paper-surface);  color: var(--color-text-on-light); }
+.surf--light  { background-color: var(--color-paper-light);    color: var(--color-text-on-light); }
+.surf--letter { background-color: var(--color-paper-letter);   color: var(--color-text-on-light); }
+.surf--paper::after, .surf--light::after, .surf--letter::after {
+  opacity: .055; mix-blend-mode: multiply;   /* 紙張要讀成纖維而非反光 */
+}
+
+/* ── 排印 ── */
+.t-display { font-size: 64px; font-weight: 600; line-height: 1.10; letter-spacing: .04em; }
+.t-h1      { font-size: 44px; font-weight: 600; line-height: 1.16; letter-spacing: .04em; }
+.t-h2      { font-size: 30px; font-weight: 600; line-height: 1.25; letter-spacing: .03em; }
+.t-h3      { font-size: 22px; font-weight: 600; line-height: 1.35; letter-spacing: .02em; }
+.t-lead    { font-size: 18px; line-height: 1.80; }
+.t-small   { font-size: 14px; line-height: 1.70; }
+.t-caption { font-size: 13px; line-height: 1.65; letter-spacing: .04em; }
+.t-label   { font-family: var(--sans); font-size: 11px; line-height: 1.60;
+             letter-spacing: .28em; text-transform: uppercase; }
+.t-meta    { font-family: var(--sans); font-size: 11px; line-height: 1.60; letter-spacing: .28em; }
+.t-muted   { color: var(--color-text-muted-on-dark); }
+.t-accent  { color: var(--color-text-accent); }
+.t-num     { font-variant-numeric: tabular-nums; }
+
+/* 正文欄：C 級必須置中且不超過 --measure，否則會落進邊緣漸亮區 */
+.measure   { max-width: var(--measure); }
+.tier-reading .measure { margin-inline: auto; }
+:lang(en) .measure { max-width: 60ch; }
+
+/* ── 印刷裝飾：真實元素，純裝飾帶 aria-hidden ── */
+.decor-rule    { height: 1px; background: var(--color-border-on-dark); }
+.decor-dash    { width: 24px; height: 2px; background: var(--color-accent-secondary); }
+.decor-num     { font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+                 color: var(--color-text-muted-on-dark); }
+.decor-corner  { position: absolute; width: 10px; height: 10px;
+                 border-top: 1px solid var(--color-border-on-dark);
+                 border-left: 1px solid var(--color-border-on-dark); }
+.decor-dust    { position: absolute; width: 2px; height: 2px; border-radius: 50%;
+                 background: var(--color-dust); }
+.decor-scratch { position: absolute; width: 1px; opacity: .55;
+                 background: var(--color-scratch); }
+
+/* 幾何細線與弧線：大半徑圓弧，不裁切、直接穿出畫面外。
+   整圈 1px 橢圓只有一小段落在畫面內，讀成一道構圖弧而不是一個圓。 */
+/* fixed 而非 absolute：無定位祖先時 absolute 會落在初始包含塊上，
+   長頁面捲動後裝飾就離開畫面了。這些和顆粒同屬背景材質，一律錨定視窗。 */
+.decor-arc     { position: fixed; pointer-events: none; z-index: 0;
+                 border: 1px solid var(--color-hairline); border-radius: 50%; }
+.decor-arc--a  { width: 120vw; height: 120vw; left: -14vw; top: -64vw; }
+.decor-arc--b  { width:  86vw; height:  86vw; right: -30vw; bottom: -46vw; }
+
+/* 塵點：位置寫死不隨機 —— 隨機會讓每次重載的分布不同，而磨損是靜態材質。
+   面積 12 個 2px 塵點共 48px²，遠低於 1280×800 的 1000px² 預算。
+
+   **不與弧線同時出現斷續刮痕。** 弧線是構圖語彙、刮痕是損傷語彙，兩者的
+   觀感不同，疊在一起會互相抵銷。用了弧線就只配塵點。
+
+   不壓透明度，塵點就是規格寫的 --color-dust。合成 luma 66 略高於天花板
+   標題那個 65，但第 3 條驗收判的是三條面積帶，12 個 2px 塵點共 48px²
+   對任何一帶都無足輕重。刮痕才需要 .55（luma 82.5），那寫在 .decor-scratch。 */
+.decor-grit    { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.decor-grit::before {
+                 content: ""; position: absolute; left: 9%; top: 22%;
+                 width: 2px; height: 2px; border-radius: 50%; background: var(--color-dust);
+                 box-shadow:
+                   14vw  9vh var(--color-dust),  31vw 27vh var(--color-dust),
+                   47vw  4vh var(--color-dust),  56vw 41vh var(--color-dust),
+                   63vw 15vh var(--color-dust),  72vw 33vh var(--color-dust),
+                   19vw 46vh var(--color-dust),  38vw 58vh var(--color-dust),
+                   58vw 66vh var(--color-dust),  77vw 55vh var(--color-dust),
+                   84vw 24vh var(--color-dust),  27vw 71vh var(--color-dust); }
+
+/* 鏡像重影：既有英文小標的處理手法，不新增內容 ——
+   data-ghost 必須與元素本身的文字相同，lint 會檢查兩者是否一致。 */
+.ghost         { position: relative; }
+.ghost::after  { content: attr(data-ghost); position: absolute; left: 0; top: 100%;
+                 transform: scaleY(-1); opacity: .14; pointer-events: none;
+                 -webkit-mask-image: linear-gradient(to bottom, #000, transparent 68%);
+                         mask-image: linear-gradient(to bottom, #000, transparent 68%); }
+
+/* 邊緣編目微型字：屬材質而非資訊，內容取自頁面既有中繼資料，不得杜撰。 */
+.edge-code     { position: fixed; right: var(--space-4); top: 50%; z-index: 0;
+                 transform: translateY(-50%) rotate(90deg); transform-origin: right center;
+                 font-family: var(--sans); font-size: 9px; letter-spacing: .5em;
+                 text-transform: uppercase; pointer-events: none;
+                 color: var(--color-text-muted-on-dark); opacity: .16; }
+
+/* ── 按鈕 ── */
+.btn { display: inline-flex; align-items: center; gap: var(--space-2);
+       padding: 12px 26px; border-radius: 1px; cursor: pointer; text-decoration: none;
+       font-family: var(--sans); font-size: 12px; font-weight: 600;
+       letter-spacing: .16em; text-transform: uppercase;
+       transition: background-color 150ms cubic-bezier(.2,0,0,1),
+                   color 150ms cubic-bezier(.2,0,0,1),
+                   border-color 150ms cubic-bezier(.2,0,0,1),
+                   transform 150ms cubic-bezier(.2,0,0,1); }
+.btn-primary   { background: var(--color-accent-primary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-cta       { background: var(--color-accent-secondary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-secondary { background: transparent; color: var(--color-text-on-dark);
+                 border: 1px solid var(--color-border-accent); }
+/* 標籤走米白而非橘棕：12px 橘棕在邊緣漏光區只有 2.85:1。
+   可操作性由橘棕邊框承擔，仍符合「透明背景 + 細邊框」。 */
+.btn-en        { font-size: 10px; letter-spacing: .24em; opacity: .72; }
+.btn:hover     { transform: translateY(-1px); }
+.btn:active    { transform: translateY(1px); }
+.btn-primary:hover    { background: var(--color-accent-hover); }
+.btn-primary:active   { background: var(--color-accent-pressed); }
+.btn-secondary:hover  { color: var(--color-text-accent-hover);
+                        border-color: var(--color-accent-hover); }
+/* 深色背景上的 Active 不落到 --color-accent-pressed（明度不足） */
+.btn-secondary:active { background: var(--color-accent-primary);
+                        color: var(--color-text-on-accent);
+                        border-color: var(--color-accent-primary); }
+.btn:disabled  { opacity: .4; cursor: not-allowed; pointer-events: none; transform: none; }
+
+.link { color: var(--color-link); text-decoration: none; }
+.link:hover { color: var(--color-link-hover); text-decoration: underline;
+              text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+/* ── 面板與表格 ── */
+.panel      { background: var(--color-surface-dark); padding: var(--space-6);
+              border: 1px solid var(--color-border-on-dark);
+              box-shadow: 0 1px 0 rgb(0 0 0 / 18%); }
+.panel-line { height: 1px; margin: var(--space-4) 0; background: var(--color-border-on-dark); }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table      { width: 100%; border-collapse: collapse;
+              border-top: 2px solid var(--color-border-accent); }
+.table th, .table td { padding: 12px 8px;
+              border-bottom: 1px solid var(--color-border-on-dark); }
+.table th   { text-align: left; font-weight: 400; font-family: var(--sans);
+              font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+              color: var(--color-text-muted-on-dark); }
+.table td   { font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* ── 引用與提示 ── */
+.quote     { display: flex; gap: var(--space-4); margin: 0; padding: 20px 24px;
+             border: 1px solid var(--color-border-on-light); }
+.quote-bar { flex-shrink: 0; width: 3px; background: var(--color-accent-primary); }
+.quote p   { margin: 0; font-size: 16px; line-height: 1.7; }
+.quote cite{ display: block; margin-top: var(--space-2); font-style: normal;
+             font-size: 13px; color: var(--color-text-muted-on-light); }
+.callout   { padding: var(--space-5); border-left: 3px solid var(--color-state-info); }
+.msg       { display: flex; align-items: center; gap: var(--space-2); font-size: 13px; }
+.msg--error   { color: var(--color-state-error); }
+.msg--warning { color: var(--color-state-warning); }
+.msg--success { color: var(--color-state-success); }
+.msg--info    { color: var(--color-state-info); }
+
+/* ── 圖片框架 ── */
+.plate      { margin: 0; padding: 12px; }
+.plate-wrap { position: relative; overflow: hidden; }
+.plate-wrap img { display: block; width: 100%; height: auto; }
+.plate-mask { position: absolute; inset: 0; pointer-events: none;
+              background: var(--color-background-overlay); }
+.plate figcaption { display: flex; gap: var(--space-2); margin-top: var(--space-2);
+                    font-size: 12px; }
+.plate-num  { font-family: var(--mono); font-weight: 600; color: var(--color-text-emphasis); }
+
+/* ── 焦點與高對比 ── */
+:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
+@media (forced-colors: active) {
+  .btn, .panel, .table, .nav-item,
+  .field input, .field select, .field textarea, .check, .radio { border: 1px solid ButtonText; }
+  .bg-fixed, .surf::after { display: none; }
+  :focus-visible { outline: 2px solid Highlight; }
+}
+
+/* ── 窄螢幕：漏光半徑與正文欄同為視窗寬度的比例，等比縮放後
+      內容佔比反而變大而伸進漏光。降階以維持正文欄的暗區條件。
+      顆粒強度不隨斷點改變。 ── */
+@media (max-width: 1023px) {
+  .tier-reading    { --leak-a: 6%; --leak-b: 5%; }
+  .tier-structural { --leak-a: 9%; --leak-b: 7%; }
+}
+
+/* ── 高對比偏好：可弱化漏光，但顆粒必須保留 ── */
+@media (prefers-contrast: more) {
+  .tier-reading { --leak-a: 5%; --leak-b: 4%; }
+}
+
+/* ── 列印：停用深色背景與顆粒，改用淺色紙張 ── */
+@media print {
+  .bg-fixed { display: none; }
+  .surf::after { display: none; }
+  html, body { background: #fff; color: #000; }
+  .panel, .table { border-color: #999; }
+}
+
+/* ── 動效降級 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* 只靠 clip-path／transform 的動效沒有 opacity 起始態，
+     限制 transition-property 之後會直接彈出。補一組淡入。 */
+  .anim-reveal { opacity: 0; clip-path: none !important; }
+  .anim-reveal.is-active { opacity: 1; }
+}
+/* ===== BASE END ===== */
+
+/* ===== LONG-DOC 專屬版面 ===== */
+.doc-sheet { max-width: var(--container); margin: 0 auto; padding: var(--space-12) var(--space-6); }
+
+.doc-cover { display: grid; grid-template-columns: 1.618fr 1fr; gap: var(--space-8); align-items: end; padding-bottom: var(--space-6); border-bottom: 1px solid var(--color-border-on-dark); }
+.doc-cover .decor-dash { margin-bottom: var(--space-4); }
+.doc-cover h1 .en { display: block; margin-top: var(--space-3); font-family: var(--sans); font-size: 13px; letter-spacing: .40em; text-transform: uppercase; color: var(--color-text-muted-on-dark); }
+.doc-cover-meta { text-align: right; color: var(--color-text-muted-on-dark); }
+.doc-cover-meta div + div { margin-top: var(--space-2); }
+
+.doc-abstract { margin-top: var(--space-8); color: var(--color-text-muted-on-dark); }
+
+/* C 級正文欄須相對視窗置中：中欄固定 --measure，左右等寬對稱，
+   TOC 靠右貼齊正文左緣，不擠壓正文位置。 */
+.doc-layout { display: grid; grid-template-columns: 1fr minmax(0, var(--measure)) 1fr;
+              gap: var(--space-8); margin-top: var(--space-10); align-items: start; }
+.doc-layout > :first-child { justify-self: end; text-align: right; max-width: 260px; }
+
+.doc-sidebar { position: sticky; top: var(--space-6); }
+.doc-toc { padding: var(--space-5); }
+.doc-toc-title { font-family: var(--sans); font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--color-text-muted-on-dark); margin-bottom: var(--space-4); }
+.doc-toc-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-3); }
+.doc-toc-item { display: flex; align-items: baseline; gap: var(--space-2); }
+.doc-toc-link { color: var(--color-text-on-dark); text-decoration: none; font-size: 14px; transition: color 150ms cubic-bezier(.2,0,0,1); }
+.doc-toc-link:hover { color: var(--color-text-accent-hover); text-decoration: underline; text-underline-offset: 4px; }
+
+.doc-main { padding: var(--space-6) 0; }
+.doc-section { margin-bottom: var(--space-12); }
+.doc-section:last-child { margin-bottom: 0; }
+.doc-section-head { margin-bottom: var(--space-6); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-border-on-dark); }
+.doc-section-head h2 .en { display: block; font-family: var(--sans); font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--color-text-muted-on-dark); margin-top: var(--space-1); font-weight: 400; }
+.doc-section h3 { margin-top: var(--space-6); margin-bottom: var(--space-3); color: var(--color-text-on-dark); }
+
+.doc-main p + p { margin-top: var(--space-4); }
+.doc-main .quote { margin: var(--space-6) 0; }
+.doc-main .callout { margin: var(--space-6) 0; }
+.doc-main .plate { margin: var(--space-8) 0; }
+.doc-main .table-wrap { margin: var(--space-8) 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+.colophon { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-12); padding-top: var(--space-5); border-top: 1px solid var(--color-border-on-dark); color: var(--color-text-muted-on-dark); }
+
+@media (max-width: 1023px) {
+  .doc-cover, .doc-layout { grid-template-columns: 1fr; }
+  .doc-layout > :first-child { justify-self: stretch; text-align: left; max-width: none; }
+  .doc-cover-meta { text-align: left; }
+  .doc-sidebar { position: static; }
+}
+@media (max-width: 767px) {
+  .doc-sheet { padding: var(--space-8) var(--space-4); }
+  .t-display { font-size: 40px; }
+  .t-h1 { font-size: 32px; } .t-h2 { font-size: 24px; } .t-h3 { font-size: 19px; }
+  .t-lead { font-size: 17px; }
+  .doc-main { padding: var(--space-4) 0; }
+}
+</style>
+</head>
+<body class="tier-reading">
+
+<div class="bg-fixed" aria-hidden="true"></div>
+<!-- 邊緣編目微型字：屬材質而非資訊，內容取自本頁既有中繼資料，不得杜撰 -->
+<span class="edge-code" aria-hidden="true">ADR-2026-IDX-004 · 2026-07-30</span>
+
+<main class="doc-sheet">
+  <!-- Cover Area -->
+  <header class="doc-cover">
+    <div>
+      <div class="decor-dash" aria-hidden="true"></div>
+      <p class="t-label t-muted">技術架構白皮書 / ARCHITECTURE DECISION RECORD</p>
+      <h1 class="t-h1" style="margin-top:var(--space-3)">
+        離線全文索引引擎架構決策紀錄<span class="en">Offline Full-Text Index Engine Architecture: LSM-Tree &amp; Roaring Bitmap</span>
+      </h1>
+    </div>
+    <div class="doc-cover-meta t-meta">
+      <div>2026-07-30</div>
+      <div>核心搜尋架構委員會</div>
+      <div class="decor-num">ADR-2026-IDX-004</div>
+    </div>
+  </header>
+
+  <p class="doc-abstract t-lead measure">因為傳統 B+ Tree 在處理 100,000,000 筆離線文件寫入時引發過度的隨機 I/O 與頁面分割，導致寫入吞吐量崩潰至 12,000 docs/sec，所以本架構全面轉向 LSM-Tree 搭配 MemTable 與 SSTable 的分層儲存結構。因為倒排索引的 Posting List 佔據超過 60% 空間，所以放棄單純的 Delta Varint 編碼，改採 Roaring Bitmap 進行區塊化壓縮與 SIMD 位元運算。此項重構使索引體積由 48 GB 縮減至 14.4 GB（降幅 70.0%），寫入吞吐量提升至 85,000 docs/sec（提升 608.3%），P99 查詢延遲由 38.6 ms 降至 4.2 ms（降低 89.1%）。</p>
+
+  <!-- Layout: Sidebar TOC + Main Content Body -->
+  <div class="doc-layout">
+    <aside class="doc-sidebar">
+      <nav class="doc-toc panel surf surf--card" aria-label="目錄">
+        <div class="doc-toc-title">目錄 / CONTENTS</div>
+        <ul class="doc-toc-list">
+          <li class="doc-toc-item">
+            <span class="decor-num">01</span>
+            <a class="doc-toc-link" href="#section-1">第一章：背景與離線索引效能瓶頸</a>
+          </li>
+          <li class="doc-toc-item">
+            <span class="decor-num">02</span>
+            <a class="doc-toc-link" href="#section-2">第二章：架構抉擇與 LSM-Tree / Roaring Bitmap 重構</a>
+          </li>
+          <li class="doc-toc-item">
+            <span class="decor-num">03</span>
+            <a class="doc-toc-link" href="#section-3">第三章：數據驗證與實測評估</a>
+          </li>
+          <li class="doc-toc-item">
+            <span class="decor-num">04</span>
+            <a class="doc-toc-link" href="#section-4">第四章：架構總結與後續演進路線</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Long Text Body -->
+    <article class="doc-main">
+      <section id="section-1" class="doc-section">
+        <header class="doc-section-head">
+          <h2 class="t-h2">
+            第一章：背景與離線索引效能瓶頸
+            <span class="en">Chapter 1: Background &amp; Offline Index Bottlenecks</span>
+          </h2>
+        </header>
+        <div class="measure">
+          <p>原架構採用傳統 B+ Tree 管理倒排索引，當處理 100,000,000 筆文件（單筆平均 1.2 KB，總重 120 GB）時，索引節點在 4 KB Page 之間發生頻繁的隨機插入與 Page Split。量測顯示，當 B+ Tree 樹高達到 5 層後，磁碟 Read-Before-Write 開銷佔據 68% 的 I/O 時間，單節點寫入吞吐量自初始的 45,000 docs/sec 急速滑落至 12,000 docs/sec，導致 120 GB 資料的索引總建置時間長達 2.3 小時，嚴重吃緊 4 小時的批次維護視窗。</p>
+          <p>此外，在查詢端，舊型 SkipList 倒排鏈結串列在記憶體中缺乏對齊，單次多關鍵字交集查詢需要遍歷長度超過 500,000 的 DocID 陣列。因為指標追蹤造成大量的 CPU Cache Miss（測得 L3 Cache Miss Rate 高達 42.1%），使得 P99 查詢延遲高達 38.6 ms，在 1,000 QPS 的併發負載下，CPU 核心利用率即達到 94.2% 的飽和極限。</p>
+        </div>
+        <blockquote class="quote surf surf--letter">
+          <div class="quote-bar" aria-hidden="true"></div>
+          <div>
+            <p>因為 B+ Tree 的原地更新（In-place Update）機制違背了現代 SSD 磁碟的塊擦除（Block Erase）物理特性，所以將寫入模型由 B+ Tree 重構成 LSM-Tree 追加寫入（Append-only），是解除萬級 QPS 隨機 I/O 鎖死的唯一數學解答。</p>
+            <cite>核心搜尋架構委員會 · 2026 技術決策備忘錄</cite>
+          </div>
+        </blockquote>
+      </section>
+
+      <div class="decor-rule" aria-hidden="true" style="margin: var(--space-8) 0;"></div>
+
+      <section id="section-2" class="doc-section">
+        <header class="doc-section-head">
+          <h2 class="t-h2">
+            第二章：架構抉擇與 LSM-Tree / Roaring Bitmap 重構
+            <span class="en">Chapter 2: Architecture Selection &amp; LSM-Tree / Roaring Bitmap Refactoring</span>
+          </h2>
+        </header>
+        <div class="measure">
+          <p>架構重構第一階段全面廢棄 B+ Tree，改採用 LSM-Tree（Log-Structured Merge-tree）作為寫入引擎。當新文件傳入時，系統先寫入 64 MB 的 Write-Ahead Log（WAL），隨後在 SkipList MemTable 中完成 100% 的記憶體排序。當 MemTable 達到 64 MB 臨界值時，觸發背景凍結並以 128 MB/s 的順序 I/O 刷入 L0 階層的 SSTable 檔案。實驗數據證實，此設計將磁碟隨機寫入比例由 84.5% 降至 0.0%，寫入吞吐量直升至 85,000 docs/sec，提升幅度高達 608.3%。</p>
+        </div>
+        <h3 class="t-h3">2.1 Roaring Bitmap 容器化與 AVX-512 指令集優化</h3>
+        <div class="measure">
+          <p>第二階段針對 Posting List 的壓縮算法進行重新設計。放棄傳統 Delta Varint 編碼，導入 Roaring Bitmap 資料結構。Roaring Bitmap 將 32 位元 DocID 拆分為高 16 位元（Container 索引）與低 16 位元。當單一 Container 內 DocID 數量少於 4,096 時採 Array Container，大於 4,096 時轉為 8 KB 的 Bitmap Container，連續區段則自動轉換成 RLE Container。透過 AVX-512 SIMD 指令集進行位元 AND 運算，單一 CPU 週期可處理 256 位元，使倒排清單交集運算速度提升 4.8 倍，索引壓縮體積由原本的 48 GB 大幅收斂至 14.4 GB，節省 70.0% 的空間。</p>
+        </div>
+        <figure class="plate surf surf--paper">
+          <div class="plate-wrap">
+            <img src="../img/demo/index-pipeline.png" alt="寫入路徑與查詢路徑的雙管線示意圖">
+          </div>
+          <figcaption>
+            <span class="plate-num">FIG. 01</span>LSM-Tree 與 Roaring Bitmap 雙層寫入與查詢快取管線圖（展示 WAL, MemTable, SSTable 與 SIMD 位元圖交集處理流）
+          </figcaption>
+        </figure>
+      </section>
+
+      <div class="decor-rule" aria-hidden="true" style="margin: var(--space-8) 0;"></div>
+
+      <section id="section-3" class="doc-section">
+        <header class="doc-section-head">
+          <h2 class="t-h2">
+            第三章：數據驗證與實測評估
+            <span class="en">Chapter 3: Benchmark Data &amp; Performance Evaluation</span>
+          </h2>
+        </header>
+        <div class="measure">
+          <p>為驗證方案效能，測試團隊在由 8 核心 CPU、32 GB RAM 與 NVMe SSD 組成之獨立測試環境中，對 100,000,000 筆文件（總容量 120 GB）進行了連續 3 輪完整基準測試。數據顯示，寫入吞吐量由舊版 B+ Tree 的 12,000 docs/sec 提高至 85,000 docs/sec（提升 608.3%），使得 120 GB 全量索引的建置時間自 2.3 小時大幅縮短至 19.6 分鐘。</p>
+        </div>
+        <div class="table-wrap table-scroll">
+          <table class="table">
+            <thead>
+              <tr><th>評估指標</th><th>舊版 B+ Tree</th><th>LSM + Roaring Bitmap</th><th>優化幅度</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>寫入吞吐量 (docs/sec)</td><td>12,000</td><td>85,000</td><td>+608.3%</td></tr>
+              <tr><td>P99 查詢延遲 (ms)</td><td>38.6</td><td>4.2</td><td>-89.1%</td></tr>
+              <tr><td>索引磁碟體積 (GB)</td><td>48.0</td><td>14.4</td><td>-70.0%</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout surf surf--light">
+          <p class="t-small">數據說明：測試結果取自 3 輪獨立基準測試之平均值。硬體配置為 8 核心 CPU、32 GB RAM、NVMe SSD，數據集規模為 100,000,000 筆文件 (120 GB 原生文本)。</p>
+        </div>
+      </section>
+
+      <div class="decor-rule" aria-hidden="true" style="margin: var(--space-8) 0;"></div>
+
+      <section id="section-4" class="doc-section">
+        <header class="doc-section-head">
+          <h2 class="t-h2">
+            第四章：架構總結與後續演進路線
+            <span class="en">Chapter 4: Architecture Conclusion &amp; Future Roadmap</span>
+          </h2>
+        </header>
+        <div class="measure">
+          <p>本專案的架構重構成果證明：在海量離線全文索引場景中，以追加寫入為核心的 LSM-Tree 搭配高壓縮比且支援向量計算的 Roaring Bitmap，其綜合效能全面超越傳統的 B+ Tree 模型。全量 120 GB 文本索引建置時間壓低至 19.6 分鐘後，批次維護視窗使用率僅為 8.2%，大幅解除了系統在資料規模擴展時的排程壓力。計畫於 2027 Q1 導入 GPU CUDA 指令與動態 Tiering 策略，確保本地 SSD 空間佔用維持在 20.0 GB 以內。</p>
+        </div>
+      </section>
+    </article>
+  </div>
+
+  <footer class="colophon t-meta">
+    <span>核心搜尋架構委員會 · 2026-07-30</span>
+    <span class="decor-num">ADR-2026-IDX-004</span>
+  </footer>
+</main>
+</body>
+</html>

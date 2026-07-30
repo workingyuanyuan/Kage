@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<!-- ==================================================================
+     影 · kage — PORTFOLIO (EN)
+     Portfolio / Case Studies. Screen delivery, no print version.
+     Tier: A Narrative (body has no tier class)
+     Images are the protagonist, text builds the reading path.
+
+     Spec: references/material.md (Material & Color)
+           references/design.md (Layout & Components)
+     ================================================================== -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{Portfolio Title}}</title>
+<meta name="description" content="{{Portfolio Description}}">
+<meta name="author" content="{{Creator / Team Name}}">
+<meta name="generator" content="kage">
+<link rel="canonical" href="{{Canonical URL}}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{Portfolio Title}}">
+<meta property="og:description" content="{{Portfolio Description}}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../fonts/noto-serif-tc/noto-serif-tc.css">
+<style>
+/* ===== BASE BEGIN — 全部模板逐字共用，不得單獨修改 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* 色彩 — 與 references/tokens.json 逐字一致 */
+  --color-accent-primary:         #a95d35;
+  --color-accent-secondary:       #b55829;
+  --color-accent-hover:           #db6f39;
+  --color-accent-pressed:         #7c4120;
+
+  --color-background-base:        #000000;   /* 實際繪製色 */
+  --color-background-global:      #0d0d0d;   /* 疊顆粒後的目標值，不可直接當底色 */
+  --color-background-field-warm:  #0f0f0f;
+  --color-background-field-cool:  #0c0e0f;
+  --color-background-deep:        #050505;
+  --color-background-overlay:     rgb(9 9 9 / 52%);
+
+  --color-leak-1:                 #1a1210;
+  --color-leak-2:                 #26170f;
+  --color-leak-3:                 #331c0f;
+  --color-leak-4:                 #432513;
+  --color-leak-core:              #683e1d;
+  --color-leak-source:            rgb(255 114 29 / 24%);
+
+  --color-tint-cool:              #111516;
+
+  --color-grain:                  rgb(128 128 128 / 10%);
+  --color-dust:                   #424242;
+  --color-scratch:                #56524d;
+  --color-hairline:               rgb(238 228 213 / 11%);
+
+  --color-surface-dark:           #29241e;
+  --color-surface-dark-secondary: #40362c;
+  --color-paper-surface:          #e8dfcf;
+  --color-paper-light:            #f0e8da;
+  --color-paper-letter:           #d8c8aa;
+
+  --color-text-on-dark:           #eee4d5;
+  --color-text-muted-on-dark:     #bba893;
+  --color-text-on-light:          #29241e;
+  --color-text-muted-on-light:    #6f6559;
+
+  --color-text-accent:            #a95d35;
+  --color-text-accent-hover:      #db6f39;
+  --color-text-emphasis:          #7c4120;
+  --color-text-on-accent:         #f0e8da;
+
+  --color-border-accent:          #a95d35;
+  --color-border-on-dark:         rgb(238 228 213 / 32%);
+  --color-border-on-light:        rgb(124 65 32 / 28%);
+
+  --color-link:                   #a95d35;
+  --color-link-hover:             #db6f39;
+  --color-focus-ring:             #db6f39;
+  --color-icon-accent:            #b55829;
+
+  --color-state-success:          #6b7350;
+  --color-state-warning:          #9a7433;
+  --color-state-error:            #9c4a3c;
+  --color-state-info:             #5c6b78;
+
+  /* 間距 */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px;  --space-6: 32px;  --space-8: 48px;  --space-10: 64px;
+  --space-12: 96px; --space-16: 128px;
+
+  /* 字體 */
+  --serif: "Noto Serif TC", "Source Han Serif TC", "Source Han Serif TW",
+           "Songti TC", "PMingLiU", Georgia, serif;
+  --sans:  "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --mono:  ui-monospace, "SF Mono", Consolas, monospace;
+
+  --container: 1200px;
+  --measure:   38em;        /* 正文行寬上限，約 646px */
+
+  /* 漏光光源的 RGB 通道。--color-leak-source 已把 alpha 烘進去，
+     而漏光強度需隨頁型變動，故另存通道三元組供 rgb() 組裝。 */
+  --leak-rgb: 255 114 29;
+
+  /* 漏光強度預設 A 敘事型，由頁型 class 覆寫 */
+  --leak-a: 24%;
+  --leak-b: 19%;
+}
+.tier-structural { --leak-a: 15%; --leak-b: 12%; }
+.tier-reading    { --leak-a: 10%; --leak-b:  8%; }
+
+html { background-color: var(--color-background-base); }
+body {
+  font-family: var(--serif); font-size: 16px; line-height: 1.85;
+  color: var(--color-text-on-dark);
+  -webkit-font-smoothing: antialiased;
+}
+:lang(en) { line-height: 1.70; }
+
+/* ── 背景四層：繪製基色 + 暖色漏光 + 顆粒，全部錨定視窗 ──
+   基色與漏光必須在同一元素的 background stack，background-blend-mode 才生效。
+   漸層水平半徑用 vw 不能用 %（% 無法與長度混入 min()，整條 background-image
+   會靜默退回 none）；垂直半徑維持 % 以對應 visual viewport。            */
+.bg-fixed {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-color: var(--color-background-base);
+  background-image:
+    radial-gradient(ellipse min(55vw, 900px) 90% at 104% 50%,
+                    rgb(var(--leak-rgb) / var(--leak-a)) 0%, rgb(var(--leak-rgb) / 0%) 100%),
+    radial-gradient(ellipse min(45vw, 760px) 70% at -6% 88%,
+                    rgb(var(--leak-rgb) / var(--leak-b)) 0%, rgb(var(--leak-rgb) / 0%) 100%);
+  background-blend-mode: screen;
+}
+.bg-fixed::after {
+  content: ""; position: absolute; inset: 0;
+  opacity: .10;
+  background-image: url("../img/grain-200.png");
+  background-size: 200px 200px;
+  /* 顆粒為靜態材質，不得加入閃爍、位移或任何動畫 */
+}
+main { position: relative; z-index: 1; }
+
+/* ── 局部表面：只有顆粒，不套漏光與中央沉暗構圖 ── */
+.surf { position: relative; }
+.surf > * { position: relative; z-index: 2; }
+.surf::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: .10;
+  background-image: url("../img/grain-200.png");
+  background-size: 200px 200px;
+}
+.surf--card   { background-color: var(--color-surface-dark); }
+.surf--sub    { background-color: var(--color-surface-dark-secondary); }
+.surf--paper  { background-color: var(--color-paper-surface);  color: var(--color-text-on-light); }
+.surf--light  { background-color: var(--color-paper-light);    color: var(--color-text-on-light); }
+.surf--letter { background-color: var(--color-paper-letter);   color: var(--color-text-on-light); }
+.surf--paper::after, .surf--light::after, .surf--letter::after {
+  opacity: .055; mix-blend-mode: multiply;   /* 紙張要讀成纖維而非反光 */
+}
+
+/* ── 排印 ── */
+.t-display { font-size: 64px; font-weight: 600; line-height: 1.10; letter-spacing: .04em; }
+.t-h1      { font-size: 44px; font-weight: 600; line-height: 1.16; letter-spacing: .04em; }
+.t-h2      { font-size: 30px; font-weight: 600; line-height: 1.25; letter-spacing: .03em; }
+.t-h3      { font-size: 22px; font-weight: 600; line-height: 1.35; letter-spacing: .02em; }
+.t-lead    { font-size: 18px; line-height: 1.80; }
+.t-small   { font-size: 14px; line-height: 1.70; }
+.t-caption { font-size: 13px; line-height: 1.65; letter-spacing: .04em; }
+.t-label   { font-family: var(--sans); font-size: 11px; line-height: 1.60;
+             letter-spacing: .28em; text-transform: uppercase; }
+.t-meta    { font-family: var(--sans); font-size: 11px; line-height: 1.60; letter-spacing: .28em; }
+.t-muted   { color: var(--color-text-muted-on-dark); }
+.t-accent  { color: var(--color-text-accent); }
+.t-num     { font-variant-numeric: tabular-nums; }
+
+/* 正文欄：C 級必須置中且不超過 --measure，否則會落進邊緣漸亮區 */
+.measure   { max-width: var(--measure); }
+.tier-reading .measure { margin-inline: auto; }
+:lang(en) .measure { max-width: 60ch; }
+
+/* ── 印刷裝飾：真實元素，純裝飾帶 aria-hidden ── */
+.decor-rule    { height: 1px; background: var(--color-border-on-dark); }
+.decor-dash    { width: 24px; height: 2px; background: var(--color-accent-secondary); }
+.decor-num     { font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+                 color: var(--color-text-muted-on-dark); }
+.decor-corner  { position: absolute; width: 10px; height: 10px;
+                 border-top: 1px solid var(--color-border-on-dark);
+                 border-left: 1px solid var(--color-border-on-dark); }
+.decor-dust    { position: absolute; width: 2px; height: 2px; border-radius: 50%;
+                 background: var(--color-dust); }
+.decor-scratch { position: absolute; width: 1px; opacity: .55;
+                 background: var(--color-scratch); }
+
+/* 幾何細線與弧線：大半徑圓弧，不裁切、直接穿出畫面外。
+   整圈 1px 橢圓只有一小段落在畫面內，讀成一道構圖弧而不是一個圓。 */
+/* fixed 而非 absolute：無定位祖先時 absolute 會落在初始包含塊上，
+   長頁面捲動後裝飾就離開畫面了。這些和顆粒同屬背景材質，一律錨定視窗。 */
+.decor-arc     { position: fixed; pointer-events: none; z-index: 0;
+                 border: 1px solid var(--color-hairline); border-radius: 50%; }
+.decor-arc--a  { width: 120vw; height: 120vw; left: -14vw; top: -64vw; }
+.decor-arc--b  { width:  86vw; height:  86vw; right: -30vw; bottom: -46vw; }
+
+/* 塵點：位置寫死不隨機 —— 隨機會讓每次重載的分布不同，而磨損是靜態材質。
+   面積 12 個 2px 塵點共 48px²，遠低於 1280×800 的 1000px² 預算。
+
+   **不與弧線同時出現斷續刮痕。** 弧線是構圖語彙、刮痕是損傷語彙，兩者的
+   觀感不同，疊在一起會互相抵銷。用了弧線就只配塵點。
+
+   不壓透明度，塵點就是規格寫的 --color-dust。合成 luma 66 略高於天花板
+   標題那個 65，但第 3 條驗收判的是三條面積帶，12 個 2px 塵點共 48px²
+   對任何一帶都無足輕重。刮痕才需要 .55（luma 82.5），那寫在 .decor-scratch。 */
+.decor-grit    { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.decor-grit::before {
+                 content: ""; position: absolute; left: 9%; top: 22%;
+                 width: 2px; height: 2px; border-radius: 50%; background: var(--color-dust);
+                 box-shadow:
+                   14vw  9vh var(--color-dust),  31vw 27vh var(--color-dust),
+                   47vw  4vh var(--color-dust),  56vw 41vh var(--color-dust),
+                   63vw 15vh var(--color-dust),  72vw 33vh var(--color-dust),
+                   19vw 46vh var(--color-dust),  38vw 58vh var(--color-dust),
+                   58vw 66vh var(--color-dust),  77vw 55vh var(--color-dust),
+                   84vw 24vh var(--color-dust),  27vw 71vh var(--color-dust); }
+
+/* 鏡像重影：既有英文小標的處理手法，不新增內容 ——
+   data-ghost 必須與元素本身的文字相同，lint 會檢查兩者是否一致。 */
+.ghost         { position: relative; }
+.ghost::after  { content: attr(data-ghost); position: absolute; left: 0; top: 100%;
+                 transform: scaleY(-1); opacity: .14; pointer-events: none;
+                 -webkit-mask-image: linear-gradient(to bottom, #000, transparent 68%);
+                         mask-image: linear-gradient(to bottom, #000, transparent 68%); }
+
+/* 邊緣編目微型字：屬材質而非資訊，內容取自頁面既有中繼資料，不得杜撰。 */
+.edge-code     { position: fixed; right: var(--space-4); top: 50%; z-index: 0;
+                 transform: translateY(-50%) rotate(90deg); transform-origin: right center;
+                 font-family: var(--sans); font-size: 9px; letter-spacing: .5em;
+                 text-transform: uppercase; pointer-events: none;
+                 color: var(--color-text-muted-on-dark); opacity: .16; }
+
+/* ── 按鈕 ── */
+.btn { display: inline-flex; align-items: center; gap: var(--space-2);
+       padding: 12px 26px; border-radius: 1px; cursor: pointer; text-decoration: none;
+       font-family: var(--sans); font-size: 12px; font-weight: 600;
+       letter-spacing: .16em; text-transform: uppercase;
+       transition: background-color 150ms cubic-bezier(.2,0,0,1),
+                   color 150ms cubic-bezier(.2,0,0,1),
+                   border-color 150ms cubic-bezier(.2,0,0,1),
+                   transform 150ms cubic-bezier(.2,0,0,1); }
+.btn-primary   { background: var(--color-accent-primary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-cta       { background: var(--color-accent-secondary); color: var(--color-text-on-accent);
+                 border: 1px solid var(--color-accent-pressed); }
+.btn-secondary { background: transparent; color: var(--color-text-on-dark);
+                 border: 1px solid var(--color-border-accent); }
+/* 標籤走米白而非橘棕：12px 橘棕在邊緣漏光區只有 2.85:1。
+   可操作性由橘棕邊框承擔，仍符合「透明背景 + 細邊框」。 */
+.btn-en        { font-size: 10px; letter-spacing: .24em; opacity: .72; }
+.btn:hover     { transform: translateY(-1px); }
+.btn:active    { transform: translateY(1px); }
+.btn-primary:hover    { background: var(--color-accent-hover); }
+.btn-primary:active   { background: var(--color-accent-pressed); }
+.btn-secondary:hover  { color: var(--color-text-accent-hover);
+                        border-color: var(--color-accent-hover); }
+/* 深色背景上的 Active 不落到 --color-accent-pressed（明度不足） */
+.btn-secondary:active { background: var(--color-accent-primary);
+                        color: var(--color-text-on-accent);
+                        border-color: var(--color-accent-primary); }
+.btn:disabled  { opacity: .4; cursor: not-allowed; pointer-events: none; transform: none; }
+
+.link { color: var(--color-link); text-decoration: none; }
+.link:hover { color: var(--color-link-hover); text-decoration: underline;
+              text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+/* ── 面板與表格 ── */
+.panel      { background: var(--color-surface-dark); padding: var(--space-6);
+              border: 1px solid var(--color-border-on-dark);
+              box-shadow: 0 1px 0 rgb(0 0 0 / 18%); }
+.panel-line { height: 1px; margin: var(--space-4) 0; background: var(--color-border-on-dark); }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table      { width: 100%; border-collapse: collapse;
+              border-top: 2px solid var(--color-border-accent); }
+.table th, .table td { padding: 12px 8px;
+              border-bottom: 1px solid var(--color-border-on-dark); }
+.table th   { text-align: left; font-weight: 400; font-family: var(--sans);
+              font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+              color: var(--color-text-muted-on-dark); }
+.table td   { font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* ── 引用與提示 ── */
+.quote     { display: flex; gap: var(--space-4); margin: 0; padding: 20px 24px;
+             border: 1px solid var(--color-border-on-light); }
+.quote-bar { flex-shrink: 0; width: 3px; background: var(--color-accent-primary); }
+.quote p   { margin: 0; font-size: 16px; line-height: 1.7; }
+.quote cite{ display: block; margin-top: var(--space-2); font-style: normal;
+             font-size: 13px; color: var(--color-text-muted-on-light); }
+.callout   { padding: var(--space-5); border-left: 3px solid var(--color-state-info); }
+.msg       { display: flex; align-items: center; gap: var(--space-2); font-size: 13px; }
+.msg--error   { color: var(--color-state-error); }
+.msg--warning { color: var(--color-state-warning); }
+.msg--success { color: var(--color-state-success); }
+.msg--info    { color: var(--color-state-info); }
+
+/* ── 圖片框架 ── */
+.plate      { margin: 0; padding: 12px; }
+.plate-wrap { position: relative; overflow: hidden; }
+.plate-wrap img { display: block; width: 100%; height: auto; }
+.plate-mask { position: absolute; inset: 0; pointer-events: none;
+              background: var(--color-background-overlay); }
+.plate figcaption { display: flex; gap: var(--space-2); margin-top: var(--space-2);
+                    font-size: 12px; }
+.plate-num  { font-family: var(--mono); font-weight: 600; color: var(--color-text-emphasis); }
+
+/* ── 焦點與高對比 ── */
+:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
+@media (forced-colors: active) {
+  .btn, .panel, .table, .nav-item,
+  .field input, .field select, .field textarea, .check, .radio { border: 1px solid ButtonText; }
+  .bg-fixed, .surf::after { display: none; }
+  :focus-visible { outline: 2px solid Highlight; }
+}
+
+/* ── 窄螢幕：漏光半徑與正文欄同為視窗寬度的比例，等比縮放後
+      內容佔比反而變大而伸進漏光。降階以維持正文欄的暗區條件。
+      顆粒強度不隨斷點改變。 ── */
+@media (max-width: 1023px) {
+  .tier-reading    { --leak-a: 6%; --leak-b: 5%; }
+  .tier-structural { --leak-a: 9%; --leak-b: 7%; }
+}
+
+/* ── 高對比偏好：可弱化漏光，但顆粒必須保留 ── */
+@media (prefers-contrast: more) {
+  .tier-reading { --leak-a: 5%; --leak-b: 4%; }
+}
+
+/* ── 列印：停用深色背景與顆粒，改用淺色紙張 ── */
+@media print {
+  .bg-fixed { display: none; }
+  .surf::after { display: none; }
+  html, body { background: #fff; color: #000; }
+  .panel, .table { border-color: #999; }
+}
+
+/* ── 動效降級 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* 只靠 clip-path／transform 的動效沒有 opacity 起始態，
+     限制 transition-property 之後會直接彈出。補一組淡入。 */
+  .anim-reveal { opacity: 0; clip-path: none !important; }
+  .anim-reveal.is-active { opacity: 1; }
+}
+/* ===== BASE END ===== */
+
+/* ===== PORTFOLIO 專屬版面 ===== */
+.sheet { max-width: var(--container); margin: 0 auto; padding: var(--space-12) var(--space-6); overflow-x: hidden; }
+
+.masthead { display: grid; grid-template-columns: 1.618fr 1fr;
+            gap: var(--space-8); align-items: end;
+            padding-bottom: var(--space-5); }
+.masthead .decor-dash { margin-bottom: var(--space-4); }
+.masthead h1 .en { display: block; margin-top: var(--space-3);
+                   font-family: var(--sans); font-size: 13px; letter-spacing: .40em;
+                   text-transform: uppercase; color: var(--color-text-muted-on-dark); }
+.masthead-meta { text-align: right; color: var(--color-text-muted-on-dark); }
+.masthead-meta div + div { margin-top: var(--space-2); }
+
+.hero-cover { position: relative; margin-top: var(--space-8); }
+.hero-title-bleed { position: relative; z-index: 4; margin-inline: calc(var(--space-6) * -1); padding: var(--space-6); margin-top: calc(var(--space-10) * -1); }
+.hero-title-overlay { position: absolute; inset: 0; background: var(--color-background-overlay); pointer-events: none; z-index: 1; border: 1px solid var(--color-border-on-dark); }
+.hero-title-text { position: relative; z-index: 2; }
+
+.work-item { margin-top: var(--space-12); padding-top: var(--space-8); border-top: 1px solid var(--color-border-on-dark); }
+.work-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-6); }
+.work-meta-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-2); color: var(--color-text-muted-on-dark); }
+
+.collage-grid { display: grid; grid-template-columns: 7fr 5fr; gap: var(--space-6); align-items: start; margin-top: var(--space-6); }
+.collage-grid--alt { grid-template-columns: 5fr 7fr; }
+.collage-bleed-left { margin-inline-start: calc(var(--space-6) * -1); }
+.collage-bleed-right { margin-inline-end: calc(var(--space-6) * -1); }
+
+/* 拼貼保持非對稱，但承載長文的欄位相對視窗置中 */
+.work-body { display: grid; grid-template-columns: 1fr minmax(0, var(--measure)) 1fr;
+             gap: var(--space-8); margin-top: var(--space-8); align-items: start; }
+.work-body > :first-child { justify-self: end; max-width: 300px; }
+.work-results { list-style: none; padding: 0; margin-top: var(--space-4); }
+.work-results li { position: relative; padding-left: var(--space-5); margin-bottom: var(--space-3); color: var(--color-text-on-dark); }
+.work-results .decor-dash { position: absolute; left: 0; top: 12px; width: 12px; height: 1px; }
+
+.judgement-box { padding: var(--space-5); margin-top: var(--space-6); border-left: 3px solid var(--color-accent-primary); border-top: 1px solid var(--color-border-on-dark); border-right: 1px solid var(--color-border-on-dark); border-bottom: 1px solid var(--color-border-on-dark); }
+
+.contact-section { margin-top: var(--space-12); padding-top: var(--space-8); border-top: 1px solid var(--color-border-on-dark); }
+.cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-8); }
+.colophon { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-12); padding-top: var(--space-5); border-top: 1px solid var(--color-border-on-dark); color: var(--color-text-muted-on-dark); }
+
+@media (max-width: 1023px) {
+  .masthead, .collage-grid, .collage-grid--alt, .work-body { grid-template-columns: 1fr; }
+  .work-body > :first-child { justify-self: stretch; max-width: none; }
+  .masthead-meta { text-align: left; }
+  .hero-title-bleed, .collage-bleed-left, .collage-bleed-right { margin-inline: 0; margin-top: var(--space-4); }
+}
+@media (max-width: 767px) {
+  .sheet { padding: var(--space-8) var(--space-4); }
+  .t-display { font-size: 40px; }
+  .t-h1 { font-size: 32px; } .t-h2 { font-size: 24px; } .t-h3 { font-size: 19px; }
+  .t-lead { font-size: 17px; }
+  .hero-title-bleed { padding: var(--space-4); }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-fixed" aria-hidden="true"></div>
+<!-- A 敘事型的裝飾語彙。弧線不裁切、直接穿出畫面外；塵點與刮痕位置寫死，
+     合計面積 < 0.1%。三者都在背景層，aria-hidden 且不吃指標事件。 -->
+<div class="decor-arc decor-arc--a" aria-hidden="true"></div>
+<div class="decor-arc decor-arc--b" aria-hidden="true"></div>
+<div class="decor-grit" aria-hidden="true"></div>
+
+<!-- 邊緣編目微型字：內容取自本頁既有中繼資料 -->
+<span class="edge-code" aria-hidden="true">{{Portfolio Title}} · {{English Subtitle}}</span>
+
+<main class="sheet">
+
+  <header class="masthead">
+    <div>
+      <div class="decor-dash" aria-hidden="true"></div>
+      <p class="t-label t-muted">{{Category Label}}</p>
+      <h1 class="t-h1" style="margin-top:var(--space-3)">
+        {{Portfolio Name}}<span class="en">{{English Subtitle}}</span>
+      </h1>
+    </div>
+    <div class="masthead-meta t-meta">
+      <div>{{Release Year}}</div>
+      <div>{{Studio / Team Name}}</div>
+      <div class="decor-num">{{Portfolio ID}}</div>
+    </div>
+  </header>
+
+  <p class="lede t-lead measure" style="margin-top:var(--space-6); color:var(--color-text-muted-on-dark)">
+    {{One-sentence core claim: State the portfolio's visual narrative style, core domains, and design philosophy}}
+  </p>
+
+  <section class="hero-cover">
+    <figure class="plate surf surf--paper">
+      <div class="plate-wrap">
+        <img src="{{Cover Hero Image Path}}" alt="{{Hero Image Alt Text}}">
+      </div>
+      <figcaption>
+        <span class="plate-num">COVER</span>{{Caption: State visual concept judgment rather than merely describing the image}}
+      </figcaption>
+    </figure>
+    <div class="hero-title-bleed">
+      <div class="hero-title-overlay" aria-hidden="true"></div>
+      <div class="hero-title-text">
+        <div class="decor-num">{{Featured Subject ID}}</div>
+        <div class="t-display" style="color:var(--color-text-on-dark)">{{Overlapping Cross-Column Main Title}}</div>
+        <p class="t-caption t-muted" style="margin-top:var(--space-2)">{{Cross-column title support explanation or visual syntax notes}}</p>
+      </div>
+    </div>
+  </section>
+
+  <article class="work-item">
+    <div class="work-head">
+      <div>
+        <span class="decor-num">01</span>
+        <h2 class="t-h2" style="margin-top:var(--space-2)">{{Project 1 Title}}</h2>
+        <div class="work-meta-row t-meta">
+          <span>{{Client Name}}</span>
+          <span>·</span>
+          <span>{{Year}}</span>
+          <span>·</span>
+          <span>{{Role / Responsibilities}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="collage-grid">
+      <figure class="plate surf surf--paper collage-bleed-left">
+        <div class="plate-wrap">
+          <img src="{{Project 1 Main Image Path}}" alt="{{Project 1 Main Image Alt Text}}">
+        </div>
+        <figcaption>
+          <span class="plate-num">FIG. 01</span>{{Caption: State judgment rather than data range — Main visual establishes core brand identity}}
+        </figcaption>
+      </figure>
+      <figure class="plate surf surf--paper" style="align-self:end">
+        <div class="plate-wrap">
+          <img src="{{Project 1 Close-up Image Path}}" alt="{{Project 1 Close-up Image Alt Text}}">
+        </div>
+        <figcaption>
+          <span class="plate-num">FIG. 02</span>{{Caption: State judgment rather than data range — Material details reinforce tactile physicality}}
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="work-body">
+      <div class="measure">
+        <p class="t-body">{{Project 1 challenge and core context. State goals, environmental constraints, and design decisions.}}</p>
+        <p class="t-body" style="margin-top:var(--space-4)">{{Specific execution path and breakthrough points. Explain how visual language achieved narrative goals.}}</p>
+      </div>
+
+      <div>
+        <h3 class="t-h3" style="font-size:16px">{{Project 1 Key Metrics}}</h3>
+        <ul class="work-results t-small">
+          <li>
+            <div class="decor-dash" aria-hidden="true"></div>
+            {{Result Item 1: Quantified metrics or brand transformation index}}
+          </li>
+          <li>
+            <div class="decor-dash" aria-hidden="true"></div>
+            {{Result Item 2: User experience improvement or media coverage}}
+          </li>
+          <li>
+            <div class="decor-dash" aria-hidden="true"></div>
+            {{Result Item 3: System scalability and long-term impact}}
+          </li>
+          <li>
+            <div class="decor-dash" aria-hidden="true"></div>
+            {{Result Item 4: Cross-platform implementation completeness}}
+          </li>
+        </ul>
+
+        <div class="judgement-box surf surf--card">
+          <p class="t-caption" style="font-weight:600; border-left:2px solid var(--color-accent-secondary); padding-left:var(--space-3)">{{Outcome Judgment}}</p>
+          <p class="t-small" style="margin-top:var(--space-1)">{{One-sentence outcome judgment: Proves design system value in complex business scenarios}}</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="work-item">
+    <div class="work-head">
+      <div>
+        <span class="decor-num">02</span>
+        <h2 class="t-h2" style="margin-top:var(--space-2)">{{Project 2 Title}}</h2>
+        <div class="work-meta-row t-meta">
+          <span>{{Client Name}}</span>
+          <span>·</span>
+          <span>{{Year}}</span>
+          <span>·</span>
+          <span>{{Role / Responsibilities}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="collage-grid collage-grid--alt">
+      <figure class="plate surf surf--paper">
+        <div class="plate-wrap">
+          <img src="{{Project 2 Side Image Path}}" alt="{{Project 2 Side Image Alt Text}}">
+        </div>
+        <figcaption>
+          <span class="plate-num">FIG. 03</span>{{Caption: State judgment rather than data range — Layout pacing enhances information readability}}
+        </figcaption>
+      </figure>
+      <figure class="plate surf surf--paper collage-bleed-right">
+        <div class="plate-wrap">
+          <img src="{{Project 2 Main Image Path}}" alt="{{Project 2 Main Image Alt Text}}">
+        </div>
+        <figcaption>
+          <span class="plate-num">FIG. 04</span>{{Caption: State judgment rather than data range — Image color palette closely aligns with brand character}}
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="work-body">
+      <div class="measure">
+        <p class="t-body">{{Project 2 background and transformation opportunity. Describe how existing visual vocabulary was refactored.}}</p>
+        <p class="t-body" style="margin-top:var(--space-4)">{{Implementation details and production standards for cross-medium design extension.}}</p>
+      </div>
+
+      <div>
+        <h3 class="t-h3" style="font-size:16px">{{Project 2 Key Metrics}}</h3>
+        <ul class="work-results t-small">
+          <li>
+            <div class="decor-dash" aria-hidden="true"></div>
+            {{Result Item 1: Conversion rate or brand affinity uplift metrics}}
+          </li>
+          <li>
+            <div class="decor-dash" aria-hidden="true"></div>
+            {{Result Item 2: Cross-platform visual consistency establishment}}
+          </li>
+          <li>
+            <div class="decor-dash" aria-hidden="true"></div>
+            {{Result Item 3: Industry awards or international recognition}}
+          </li>
+          <li>
+            <div class="decor-dash" aria-hidden="true"></div>
+            {{Result Item 4: Long-term brand identity foundation}}
+          </li>
+        </ul>
+
+        <div class="judgement-box surf surf--card">
+          <p class="t-caption" style="font-weight:600; border-left:2px solid var(--color-accent-secondary); padding-left:var(--space-3)">{{Outcome Judgment}}</p>
+          <p class="t-small" style="margin-top:var(--space-1)">{{One-sentence outcome judgment: Restored the trust connection between brand and users}}</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <section class="contact-section">
+    <div class="section-head" style="display:flex; align-items:baseline; justify-content:space-between; padding-bottom:var(--space-3); border-bottom:1px solid var(--color-border-on-dark)">
+      <h2 class="t-h2">{{Collaboration & Inquiries}}</h2>
+      <span class="en t-label" style="color:var(--color-text-muted-on-dark)">INQUIRIES</span>
+    </div>
+    <div style="margin-top:var(--space-6)" class="measure">
+      <p class="t-lead t-muted">{{Looking forward to collaborating with teams that value visual texture and narrative depth. Contact us for a full case study or project evaluation.}}</p>
+    </div>
+    <div class="cta">
+      <a class="btn btn-primary" href="{{Primary Action Link}}">
+        {{Start a Project}}<span class="btn-en">Start a Project</span>
+        <span aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn-secondary" href="{{Secondary Action Link}}">{{Request Full PDF}}</a>
+    </div>
+  </section>
+
+  <footer class="colophon t-meta">
+    <span>{{Team Name}} · {{Release Year}}</span>
+    <span class="decor-num">{{Document ID}}</span>
+  </footer>
+
+</main>
+</body>
+</html>

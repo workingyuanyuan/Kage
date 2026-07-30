@@ -1,0 +1,33 @@
+{
+  "title": "Municipal Library Paper Archive Digitalization Proposal",
+  "subtitle": "Pursuant to Archives Act Article 15 & Library Bylaw Article 42",
+  "metrics": [
+    {
+      "value": "184,000",
+      "label": "Total Archived Documents"
+    },
+    {
+      "value": "30 Years",
+      "label": "Statutory Minimum Retention Period"
+    },
+    {
+      "value": "15%",
+      "label": "Quarterly Physical Audit Sample Rate"
+    },
+    {
+      "value": "2.45",
+      "label": "Vault Structural Safety Factor"
+    }
+  ],
+  "argument": [
+    "The 184,000 physical volumes in the collection shall enter online archival management in Q3 to fulfill Archives Act Article 15 and Library Bylaw Article 42.",
+    "Physical vault capacity has reached 94.2%; this proposal establishes climate control and audit sampling to maintain statutory safety standards."
+  ],
+  "evidence": [
+    "A 15% stratified sample of the 184,000 volumes verified paper acidification rates remain below the 0.08% threshold.",
+    "Engineers certified the environmental control vault structural load and seismic safety factor at 2.45.",
+    "Quarterly physical audits covering 15% of core historical records will ensure document integrity over the 30-year retention period."
+  ],
+  "next_step": "The Library Committee is requested to review and approve this proposal under Bylaw Article 8 for Q3 deployment.",
+  "contact": "Sonetto, Library Planning Division (Ext. 402)"
+}

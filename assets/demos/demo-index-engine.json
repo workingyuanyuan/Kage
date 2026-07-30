@@ -1,0 +1,58 @@
+{
+  "title": "離線全文索引引擎架構決策紀錄",
+  "subtitle": "在 120 GB 文本集中實現 85,000 docs/sec 寫入吞吐量與 P99 4.2 ms 查詢延遲的資料結構選型分析",
+  "author": "核心搜尋架構委員會",
+  "date": "2026-07-30",
+  "summary": {
+    "claim": "因為傳統 B+ Tree 在處理 100,000,000 筆離線文件寫入時引發過度的隨機 I/O 與頁面分割，導致寫入吞吐量崩潰至 12,000 docs/sec，所以本架構全面轉向 LSM-Tree 搭配 MemTable 與 SSTable 的分層儲存結構。因為倒排索引的 Posting List 佔據超過 60% 空間，所以放棄單純的 Delta Varint 編碼，改採 Roaring Bitmap 進行區塊化壓縮與 SIMD 位元運算。此項重構使索引體積由 48 GB 縮減至 14.4 GB（降幅 70.0%），寫入吞吐量提升至 85,000 docs/sec（提升 608.3%），P99 查詢延遲由 38.6 ms 降至 4.2 ms（降低 89.1%）。",
+    "takeaways": [
+      "因為 LSM-Tree 將隨機寫入轉化為 Sequential Disk Writes，寫入吞吐量由 12,000 docs/sec 提高至 85,000 docs/sec。",
+      "因為 Roaring Bitmap 採用 16-bit 容器分割與 SIMD 位元圖交集指令，Posting List 壓縮比提升 70.0%，索引大小由 48 GB 降至 14.4 GB。",
+      "因為 Memory-mapped I/O 配合 64-byte Cache Line 對齊避開零拷貝邊界開銷，P99 查詢延遲從 38.6 ms 降至 4.2 ms。",
+      "因為 Bloom Filter 配置 10 個 Hash 函數將 False Positive Rate 控制在 1%，成功避免 99% 的無效 SSTable 磁碟讀取。"
+    ]
+  },
+  "chapters": [
+    {
+      "title": "第一章：背景與離線索引效能瓶頸",
+      "claim": "因為系統需在 4 小時批次時程內完成 100,000,000 筆（共 120 GB 原生文字）離線文件的全文索引建置，現行基於 B+ Tree 的儲存結構引發大量 Page Split 與隨機磁碟 I/O，導致寫入吞吐量卡在 12,000 docs/sec。",
+      "paragraphs": [
+        "原架構採用傳統 B+ Tree 管理倒排索引，當處理 100,000,000 筆文件（單筆平均 1.2 KB，總重 120 GB）時，索引節點在 4 KB Page 之間發生頻繁的隨機插入與 Page Split。量測顯示，當 B+ Tree 樹高達到 5 層後，磁碟 Read-Before-Write 開銷佔據 68% 的 I/O 時間，單節點寫入吞吐量自初始的 45,000 docs/sec 急速滑落至 12,000 docs/sec，導致 120 GB 資料的索引總建置時間長達 2.3 小時，嚴重吃緊 4 小時的批次維護視窗。",
+        "此外，在查詢端，舊型 SkipList 倒排鏈結串列在記憶體中缺乏對齊，單次多關鍵字交集查詢需要遍歷長度超過 500,000 的 DocID 陣列。因為指標追蹤造成大量的 CPU Cache Miss（測得 L3 Cache Miss Rate 高達 42.1%），使得 P99 查詢延遲高達 38.6 ms，在 1,000 QPS 的併發負載下，CPU 核心利用率即達到 94.2% 的飽和極限。"
+      ]
+    },
+    {
+      "title": "第二章：架構抉擇與 LSM-Tree / Roaring Bitmap 重構",
+      "claim": "因為 LSM-Tree 將隨機寫入轉化為 64 MB 順序 Write-Ahead Log 與 MemTable 緩衝，配合 Roaring Bitmap 進行 16-bit 容器分割與 SIMD 位元運算，系統徹底解決了磁碟 I/O 瓶頸與記憶體快取不對齊問題。",
+      "paragraphs": [
+        "架構重構第一階段全面廢棄 B+ Tree，改採用 LSM-Tree（Log-Structured Merge-tree）作為寫入引擎。當新文件傳入時，系統先寫入 64 MB 的 Write-Ahead Log（WAL），隨後在 SkipList MemTable 中完成 100% 的記憶體排序。當 MemTable 達到 64 MB 臨界值時，觸發背景凍結並以 128 MB/s 的順序 I/O 刷入 L0 階層的 SSTable 檔案。實驗數據證實，此設計將磁碟隨機寫入比例由 84.5% 降至 0.0%，寫入吞吐量直升至 85,000 docs/sec，提升幅度高達 608.3%。",
+        "第二階段針對 Posting List 的壓縮算法進行重新設計。放棄傳統 Delta Varint 編碼，導入 Roaring Bitmap 資料結構。Roaring Bitmap 將 32 位元 DocID 拆分為高 16 位元（Container 索引）與低 16 位元。當單一 Container 內 DocID 數量少於 4,096 時採 Array Container，大於 4,096 時轉為 8 KB 的 Bitmap Container，連續區段則自動轉換成 RLE Container。透過 AVX-512 SIMD 指令集進行位元 AND 運算，單一 CPU 週期可處理 256 位元，使倒排清單交集運算速度提升 4.8 倍，索引壓縮體積由原本的 48 GB 大幅收斂至 14.4 GB，節省 70.0% 的空間。"
+      ],
+      "figure": {
+        "kind": "系統架構圖",
+        "caption": "LSM-Tree 與 Roaring Bitmap 雙層寫入與查詢快取管線圖"
+      }
+    },
+    {
+      "title": "第三章：數據驗證與實測評估",
+      "claim": "在 100,000,000 筆實體文件的嚴苛基準測試中，重構方案在寫入吞吐量、P99 查詢延遲與記憶體佔用等三項核心指標上均展現量化優勢，完全滿足生產環境 SLA 要求。",
+      "paragraphs": [
+        "為驗證方案效能，測試團隊在由 8 核心 CPU、32 GB RAM 與 NVMe SSD 組成之獨立測試環境中，對 100,000,000 筆文件（總容量 120 GB）進行了連續 3 輪完整基準測試。數據顯示，寫入吞吐量由舊版 B+ Tree 的 12,000 docs/sec 提高至 85,000 docs/sec（提升 608.3%），使得 120 GB 全量索引的建置時間自 2.3 小時大幅縮短至 19.6 分鐘。",
+        "在查詢端，透過 Memory-mapped I/O (mmap) 搭配 64-byte Cache Line 對齊及 Roaring Bitmap SIMD 指令，P99 查詢延遲自 38.6 ms 劇降至 4.2 ms（降低 89.1%）。此外，LSM-Tree 的 L1/L2 Compact 機制配合 10 個 Hash 函數的 Bloom Filter（False Positive Rate 控制於 1.0%），成功擋下 99.0% 的無效 disk seek。索引總磁碟佔用自 48 GB 縮減至 14.4 GB（減少 70.0%），記憶體快取佔用亦從 12.8 GB 降至 3.8 GB（降低 70.3%）。"
+      ]
+    },
+    {
+      "title": "第四章：架構總結與後續演進路線",
+      "claim": "因為 LSM-Tree 與 Roaring Bitmap 組合成功突破了離線索引的 I/O 與記憶體瓶頸，系統已具備支撐 1,000,000,000 筆超大規模文件集的技術基底，後續將推動 GPU 向量加速與動態 Tiering 策略。",
+      "paragraphs": [
+        "本專案的架構重構成果證明：在海量離線全文索引場景中，以追加寫入為核心的 LSM-Tree 搭配高壓縮比且支援向量計算的 Roaring Bitmap，其綜合效能全面超越傳統的 B+ Tree 模型。全量 120 GB 文本索引建置時間壓低至 19.6 分鐘後，批次維護視窗使用率僅為 8.2%，大幅解除了系統在資料規模擴展時的排程壓力。",
+        "未來演進將聚焦於兩個方向：首先，計畫於 2027 Q1 導入 AVX-512 與 GPU CUDA 混合指令，進一步優化 Roaring Bitmap 的多關鍵字 AND/OR 邏輯；其次，將引入冷熱資料動態 Tiering 策略，將 30 天以上的冷數據壓縮封存至 NVMe-oF 遠端儲存，確保本地 SSD 空間佔用維持在 20.0 GB 以內。"
+      ]
+    }
+  ],
+  "references": [
+    "O'Neil, P., et al. (1996). The Log-Structured Merge-Tree (LSM-Tree). Acta Informatica, 33(4), 351-385.",
+    "Chambi, S., et al. (2016). Better bitmap performance with Roaring bitmaps. Software: Practice and Experience, 46(5), 709-719.",
+    "Zukowski, M., et al. (2006). Super-Scalar RAM-CPU Cache-Compression Tradeoffs in Large-Scale Information Retrieval. ICDE 2006."
+  ]
+}

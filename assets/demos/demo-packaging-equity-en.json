@@ -1,0 +1,71 @@
+{
+  "company": "Apex Packaging Technologies Inc.",
+  "ticker": "TWSE: 9988",
+  "rating": "BUY",
+  "price_target": "$850.00",
+  "thesis": [
+    "Advanced 2.5D/3D semiconductor packaging capacity utilization is projected to reach 94% in 2026E, driving revenue up 30.8% YoY to NT$ 89,500M. The demand surge in HPC chips utilizing CoWoS-like architecture, with bonding yields reaching 92.5%, reinforces high-margin order dominance.",
+    "High-margin advanced packaging revenue share rises from 38% in 2024 to 57% in 2026E, expanding overall gross margin by 5.7 ppt to 57.2%. Following Q3 qualification of proprietary silicon interposers, unit bill-of-materials costs decrease by 14.2%, driving structural profitability enhancement.",
+    "Free cash flow turns positive in 2025E to NT$ 12,400M as capex normalizes from 45% of revenue to 26%. A robust balance sheet supports sustained R&D. We project 2026E EPS of NT$ 51.00, implying a 12.2x P/E ratio versus peer average of 19.5x, offering significant rerating upside."
+  ],
+  "valuation": [
+    {
+      "method": "P/E Multiple Valuation",
+      "result": "Target Price NT$ 850.00, implying 16.7x 2026E P/E",
+      "sensitivity": "Based on 2026E EPS of NT$ 51.00, P/E multiples of 14.0x–19.0x yield a fair value range of NT$ 714 to NT$ 969."
+    },
+    {
+      "method": "Discounted Cash Flow (DCF)",
+      "result": "Fair Value NT$ 885.00, offering 42.7% margin of safety",
+      "sensitivity": "Assuming WACC of 8.5% and terminal growth rate of 2.5%; WACC sensitivity of ±0.5% spans NT$ 810 to NT$ 960."
+    }
+  ],
+  "catalysts": [
+    {
+      "event": "Accelerated next-gen chip mass production as yields exceed 85%",
+      "date": "2026Q3",
+      "magnitude": "Boosts gross margin by 2.4 ppt, adding NT$ 3.20 to 2026E EPS"
+    },
+    {
+      "event": "Expanded long-term commitments from North American CSP clients",
+      "date": "2026Q4",
+      "magnitude": "Secures advanced packaging capacity for two years, adding NT$ 8,500M annual revenue"
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Geopolitical tech export restriction escalation",
+      "impact": "Shipment delays in targeted regions could impact 2026E revenue by 5% to 8%."
+    },
+    {
+      "risk": "Upstream raw material and substrate price volatility",
+      "impact": "A 10% increase in material costs compresses operating margin by 1.2 ppt."
+    },
+    {
+      "risk": "Slower-than-expected recovery in mature node packaging",
+      "impact": "Subdued consumer electronics demand could reduce EPS by NT$ 1.50."
+    }
+  ],
+  "financials": [
+    {
+      "label": "Revenue (NT$ M)",
+      "values": ["42,850", "51,200", "68,400", "89,500", "+30.8%"]
+    },
+    {
+      "label": "Gross Margin (%)",
+      "values": ["48.2%", "51.5%", "54.8%", "57.2%", "+2.4 ppt"]
+    },
+    {
+      "label": "Operating Income EBIT (NT$ M)",
+      "values": ["12,400", "16,800", "24,600", "34,200", "+39.0%"]
+    },
+    {
+      "label": "Net Income (NT$ M)",
+      "values": ["10,100", "13,900", "20,400", "28,600", "+40.2%"]
+    },
+    {
+      "label": "Earnings Per Share EPS (NT$)",
+      "values": ["18.20", "24.80", "36.40", "51.00", "+40.1%"]
+    }
+  ]
+}
