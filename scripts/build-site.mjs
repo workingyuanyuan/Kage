@@ -14,7 +14,7 @@ import { extractBase } from './lib/sync.mjs';
 const REPO = 'https://github.com/workingyuanyuan/Kage';
 const TOKENS = JSON.parse(readFileSync('references/tokens.json', 'utf8'));
 const BASE = extractBase(readFileSync('assets/templates/one-pager.html', 'utf8').replace(/\r\n/g, '\n'))
-  .replace(/\.\.\/img\//g, '../assets/img/');
+  .replace(/\.\.\/img\//g, 'assets/img/');
 
 const COPY = JSON.parse(readFileSync('site/_copy.json', 'utf8'));
 
@@ -186,7 +186,7 @@ const CSS = `
             border: 1px solid var(--color-border-on-dark);
             background-color: var(--color-background-base); }
 .mo-stage::after { content: ""; position: absolute; inset: 0; opacity: .10;
-                   background-image: url("../assets/img/grain-200.png"); background-size: 200px 200px; }
+                   background-image: url("assets/img/grain-200.png"); background-size: 200px 200px; }
 .mo-arc { position: absolute; width: 420px; height: 420px; left: -90px; top: 64px;
           border: 1px solid var(--color-hairline); border-radius: 50%; }
 .mo-grit { position: absolute; left: 22%; top: 28%; width: 2px; height: 2px; border-radius: 50%;
@@ -263,13 +263,13 @@ function build({ out, lang, mode, c, other }) {
 <meta name="description" content="${c['meta.desc']}">
 <meta name="author" content="workingyuanyuan">
 <meta name="generator" content="kage">
-<link rel="canonical" href="https://example.com/kage/${out.replace('site/', '')}">
+<link rel="canonical" href="https://example.com/kage/${out}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="${c['meta.title']}">
 <meta property="og:description" content="${c['meta.desc']}">
-<meta property="og:image" content="../assets/demos/${DEMOS[0][1]}${demoSuffix}-1280.png">
+<meta property="og:image" content="assets/demos/${DEMOS[0][1]}${demoSuffix}-1280.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../assets/fonts/noto-serif-tc/noto-serif-tc.css">
+<link rel="stylesheet" href="assets/fonts/noto-serif-tc/noto-serif-tc.css">
 <style>
 ${BASE}
 ${CSS}
@@ -308,8 +308,8 @@ ${CSS}
 
 ${sec('00', 'showcase', `<div class="g3">
 ${DEMOS.map(([type, slug, zh]) => `      <figure class="shot">
-        <a href="../assets/demos/${slug}${demoSuffix}.html">
-          <img src="../assets/demos/${slug}${demoSuffix}-1280.png" alt="${c[`demo.${type}.alt`]}">
+        <a href="assets/demos/${slug}${demoSuffix}.html">
+          <img src="assets/demos/${slug}${demoSuffix}-1280.png" alt="${c[`demo.${type}.alt`]}">
         </a>
         <figcaption><span class="kind">${type}</span>${c[`demo.${type}.cap`]}</figcaption>
       </figure>`).join('\n')}
@@ -397,16 +397,15 @@ ${[1,2,3,4].map(i => `      <dt>${c[`faq.${i}.q`]}</dt><dd>${c[`faq.${i}.a`]}</d
   for (const bad of ['Kami', 'Reverse 1999', 'R1999'])
     if (html.includes(bad)) throw new Error(`${out}：出現禁用字樣 ${bad}`);
 
-  mkdirSync('site', { recursive: true });
   writeFileSync(out, html);
   console.log(`  ${out}  ${(Buffer.byteLength(html) / 1024).toFixed(1)} KB`);
 }
 
 const PAGES = [
-  ['site/index.html',            'zh-Hant', 'standard', 'zh.standard', { develop: 'index-develop.html',    lang: 'index-en.html' }],
-  ['site/index-develop.html',    'zh-Hant', 'develop',  'zh.develop',  { develop: 'index.html',            lang: 'index-en-develop.html' }],
-  ['site/index-en.html',         'en',      'standard', 'en.standard', { develop: 'index-en-develop.html', lang: 'index.html' }],
-  ['site/index-en-develop.html', 'en',      'develop',  'en.develop',  { develop: 'index-en.html',         lang: 'index-develop.html' }],
+  ['index.html',            'zh-Hant', 'standard', 'zh.standard', { develop: 'index-develop.html',    lang: 'index-en.html' }],
+  ['index-develop.html',    'zh-Hant', 'develop',  'zh.develop',  { develop: 'index.html',            lang: 'index-en-develop.html' }],
+  ['index-en.html',         'en',      'standard', 'en.standard', { develop: 'index-en-develop.html', lang: 'index.html' }],
+  ['index-en-develop.html', 'en',      'develop',  'en.develop',  { develop: 'index-en.html',         lang: 'index-develop.html' }],
 ];
 
 console.log('產生官網');

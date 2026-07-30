@@ -26,11 +26,11 @@ export function extractBase(text) {
 }
 
 /**
- * 官網也帶同一段 BASE，但它在 site/ 而非 assets/templates/，資產路徑被改寫過
- * （`../img/` → `../assets/img/`）。比對前先還原那個改寫，否則會誤判成漂移。
+ * 官網也帶同一段 BASE，但它在倉庫根目錄（GitHub Pages 從根出）而非 assets/templates/，資產路徑被改寫過
+ * （`../img/` → `assets/img/`）。比對前先還原那個改寫，否則會誤判成漂移。
  * 這些頁面由 build-site.mjs 生成，只校驗不寫入 —— 要改就改參考實作再重新生成。
  */
-const SITE = { dir: 'site', rewrite: [[/\.\.\/assets\/img\//g, '../img/']] };
+const SITE = { dir: '.', rewrite: [[/assets\/img\//g, '../img/']] };
 
 function checkSite(base) {
   const out = [];

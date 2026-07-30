@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <!-- 影 · kage 官網。由 scripts/build-site.mjs 生成，不要手改。
      BASE 區塊與模板逐字共用，由 kage sync 校驗。 -->
-<html lang="en">
+<html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>kage — Physical Optics & Document Generation System</title>
-<meta name="description" content="Mapping requirements into 16 templates and 45 color tokens to generate physical on-screen HTML documents.">
+<title>影 · kage — 光影物理與文件生成系統</title>
+<meta name="description" content="輸入需求導向 16 份模板與 45 個色彩 token 的實體對應，生成純螢幕 HTML 文件。">
 <meta name="author" content="workingyuanyuan">
 <meta name="generator" content="kage">
-<link rel="canonical" href="https://example.com/kage/index-en-develop.html">
+<link rel="canonical" href="https://example.com/kage/index-develop.html">
 <meta property="og:type" content="website">
-<meta property="og:title" content="kage — Physical Optics & Document Generation System">
-<meta property="og:description" content="Mapping requirements into 16 templates and 45 color tokens to generate physical on-screen HTML documents.">
-<meta property="og:image" content="../assets/demos/demo-archive-proposal-en-1280.png">
+<meta property="og:title" content="影 · kage — 光影物理與文件生成系統">
+<meta property="og:description" content="輸入需求導向 16 份模板與 45 個色彩 token 的實體對應，生成純螢幕 HTML 文件。">
+<meta property="og:image" content="assets/demos/demo-archive-proposal-1280.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../assets/fonts/noto-serif-tc/noto-serif-tc.css">
+<link rel="stylesheet" href="assets/fonts/noto-serif-tc/noto-serif-tc.css">
 <style>
 /* ===== BASE BEGIN — 全部模板逐字共用，不得單獨修改 ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -128,7 +128,7 @@ body {
 .bg-fixed::after {
   content: ""; position: absolute; inset: 0;
   opacity: .10;
-  background-image: url("../assets/img/grain-200.png");
+  background-image: url("assets/img/grain-200.png");
   background-size: 200px 200px;
   /* 顆粒為靜態材質，不得加入閃爍、位移或任何動畫 */
 }
@@ -140,7 +140,7 @@ main { position: relative; z-index: 1; }
 .surf::after {
   content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
   opacity: .10;
-  background-image: url("../assets/img/grain-200.png");
+  background-image: url("assets/img/grain-200.png");
   background-size: 200px 200px;
 }
 .surf--card   { background-color: var(--color-surface-dark); }
@@ -421,7 +421,7 @@ main { position: relative; z-index: 1; }
             border: 1px solid var(--color-border-on-dark);
             background-color: var(--color-background-base); }
 .mo-stage::after { content: ""; position: absolute; inset: 0; opacity: .10;
-                   background-image: url("../assets/img/grain-200.png"); background-size: 200px 200px; }
+                   background-image: url("assets/img/grain-200.png"); background-size: 200px 200px; }
 .mo-arc { position: absolute; width: 420px; height: 420px; left: -90px; top: 64px;
           border: 1px solid var(--color-hairline); border-radius: 50%; }
 .mo-grit { position: absolute; left: 22%; top: 28%; width: 2px; height: 2px; border-radius: 50%;
@@ -475,17 +475,17 @@ main { position: relative; z-index: 1; }
 <main class="site-wrap">
 
   <nav class="nav">
-    <span class="nav-mark">kage</span>
+    <span class="nav-mark">影 · kage</span>
     <div class="nav-links">
-      <a class="nav-link" href="index-en.html" aria-current="true">顯影 / DEVELOP</a>
-      <a class="nav-link" href="index-develop.html">繁中</a>
+      <a class="nav-link" href="index.html" aria-current="true">顯影 / DEVELOP</a>
+      <a class="nav-link" href="index-en-develop.html">EN</a>
     </div>
   </nav>
 
   <header class="hero">
     <div class="decor-dash" aria-hidden="true"></div>
-    <h1 class="hero-aphorism" style="margin-top:var(--space-5)">The light sits outside the frame. What stays is the shadow.</h1>
-    <p class="hero-lede">kage routes AI prompt inputs into 16 self-contained HTML document structures (8 types × 2 language tracks). 45 color tokens map the design system baseline into pure screen HTML, while Noto Serif TC typography anchors within frame boundaries to displace synthetic digital sharpness.</p>
+    <h1 class="hero-aphorism" style="margin-top:var(--space-5)">光在畫面外，影在畫面裡。</h1>
+    <p class="hero-lede">「影 · kage」將 AI 代理的需求輸入，導向 16 份單檔自包含的 HTML 實體結構（劃分為 8 種類型 × 2 語軌）。由 45 個單一真相來源色彩 token 所驅動，Noto Serif TC 襯線筆劃在視窗視界內定格，替代無襯線體的銳利筆劃。</p>
     <div class="spec-strip">
       <div><span>基色</span><b>#000000 → luma 12.8</b></div>
       <div><span>漏光</span><b>18–30° · 24% / 19%</b></div>
@@ -497,94 +497,94 @@ main { position: relative; z-index: 1; }
 
 
   <section class="sec" id="s00">
-    <p class="sec-num">00 · SHOWCASE</p>
-    <h2 class="sec-title">Eight document types as physical render records</h2>
-    <p class="sec-lede">Partitioned into 8 document types across 2 language tracks, totaling 16 render files locked as self-contained HTML.</p>
+    <p class="sec-num">00 · 展示</p>
+    <h2 class="sec-title">八種類型的實體渲染紀錄</h2>
+    <p class="sec-lede">劃分為 8 種類型與 2 語軌，共 16 份渲染檔，各自完成單檔自包含鎖定。</p>
     <div class="sec-body"><div class="g3">
       <figure class="shot">
-        <a href="../assets/demos/demo-archive-proposal-en.html">
-          <img src="../assets/demos/demo-archive-proposal-en-1280.png" alt="One-pager proposal structure for Municipal Archives Filing locking 3 metric cards.">
+        <a href="assets/demos/demo-archive-proposal.html">
+          <img src="assets/demos/demo-archive-proposal-1280.png" alt="市立文獻館歸檔提案單頁摘要，鎖定 3 張指標卡片與底端行動請求欄。">
         </a>
-        <figcaption><span class="kind">one-pager</span>Filing overhead compressed by 40%, clamping executive decision window to 30 seconds.</figcaption>
+        <figcaption><span class="kind">one-pager</span>歸檔耗時向內縮減 40%，單頁框架將決策視窗固定於 30 秒上限。</figcaption>
       </figure>
       <figure class="shot">
-        <a href="../assets/demos/demo-index-engine-en.html">
-          <img src="../assets/demos/demo-index-engine-en-1280.png" alt="Architecture decision record for offline index engine featuring executive summary and 2-column structural grid.">
+        <a href="assets/demos/demo-index-engine.html">
+          <img src="assets/demos/demo-index-engine-1280.png" alt="離線索引引擎架構決策紀錄，刻劃執行摘要與 2 欄系統結構刻度。">
         </a>
-        <figcaption><span class="kind">long-doc</span>Severed real-time RPC for 100% offline indexing, arresting query latency at the 12ms boundary.</figcaption>
+        <figcaption><span class="kind">long-doc</span>切斷即時 RPC 改踩 100% 離線索引，檢索延遲止步於 12ms 阻尼邊界。</figcaption>
       </figure>
       <figure class="shot">
-        <a href="../assets/demos/demo-packaging-equity-en.html">
-          <img src="../assets/demos/demo-packaging-equity-en-1280.png" alt="Semiconductor packaging equity report showing target price and 2 valuation models.">
+        <a href="assets/demos/demo-packaging-equity.html">
+          <img src="assets/demos/demo-packaging-equity-1280.png" alt="半導體封測公司個股研報，定格目標價、評級與 2 種估值模型。">
         </a>
-        <figcaption><span class="kind">equity-report</span>Advanced packaging volume trajectory doubles by 2026, rating upgraded to buy at 35% upside baseline.</figcaption>
+        <figcaption><span class="kind">equity-report</span>先進封裝產能軌跡指向 2026 年翻倍，評級調升至買進並鎖定 35% 溢價刻度。</figcaption>
       </figure>
       <figure class="shot">
-        <a href="../assets/demos/demo-document-portfolio-en.html">
-          <img src="../assets/demos/demo-document-portfolio-en-1280.png" alt="Document design portfolio presenting 3 physical case studies and quantitative metrics.">
+        <a href="assets/demos/demo-document-portfolio.html">
+          <img src="assets/demos/demo-document-portfolio-1280.png" alt="文件設計作品集，陳列 3 個實體案例與數據邊界紀錄。">
         </a>
-        <figcaption><span class="kind">portfolio</span>Recalibrated hierarchy lifted reader completion rate by 50% while lowering bounce rate by 25%.</figcaption>
+        <figcaption><span class="kind">portfolio</span>重新校準排印階梯後，讀者完讀率上揚 50% 且跳出率沉降 25%。</figcaption>
       </figure>
       <figure class="shot">
-        <a href="../assets/demos/demo-review-notice-en.html">
-          <img src="../assets/demos/demo-review-notice-en-1280.png" alt="Preservation environment review letter featuring 600-weight serif signature.">
+        <a href="assets/demos/demo-review-notice.html">
+          <img src="assets/demos/demo-review-notice-1280.png" alt="保存環境覆核通知書信，刻印 600 字重襯線署名與單頁邊界。">
         </a>
-        <figcaption><span class="kind">letter</span>Relative humidity breaching 65% threshold mandates HVAC calibration within a 7 day window.</figcaption>
+        <figcaption><span class="kind">letter</span>相對濕度跨越 65% 警戒刻度，發出 7 天防線內的環境調校命令。</figcaption>
       </figure>
       <figure class="shot">
-        <a href="../assets/demos/demo-aperture-changelog-en.html">
-          <img src="../assets/demos/demo-aperture-changelog-en-1280.png" alt="Offline archiving tool changelog featuring v2.4.0 release and 3 breaking change logs.">
+        <a href="assets/demos/demo-aperture-changelog.html">
+          <img src="assets/demos/demo-aperture-changelog-1280.png" alt="離線歸檔工具更新日誌，記錄 v2.4.0 版本與 3 個破壞性變更斷面。">
         </a>
-        <figcaption><span class="kind">changelog</span>Excised legacy XML parser, causing peak memory footprint to drop by 60%.</figcaption>
+        <figcaption><span class="kind">changelog</span>切除舊版 XML 解析器，記憶體峰值耗用量直接崩落 60%。</figcaption>
       </figure>
       <figure class="shot">
-        <a href="../assets/demos/demo-legibility-talk-en.html">
-          <img src="../assets/demos/demo-legibility-talk-en-1280.png" alt="Presentation slides on static file legibility with 16:9 layout and chapter slide.">
+        <a href="assets/demos/demo-legibility-talk.html">
+          <img src="assets/demos/demo-legibility-talk-1280.png" alt="靜態檔案長期可讀性演講簡報，展現 16:9 框架與深色章節隔板。">
         </a>
-        <figcaption><span class="kind">slides</span>Shedding dynamic APIs into pure HTML secures raw readability across a 30 year horizon.</figcaption>
+        <figcaption><span class="kind">slides</span>剝離動態 API 凝固為純 HTML，鎖定 30 年時空軸後的瀏覽器讀取能力。</figcaption>
       </figure>
       <figure class="shot">
-        <a href="../assets/demos/demo-aperture-site-en.html">
-          <img src="../assets/demos/demo-aperture-site-en-1280.png" alt="Product landing page for offline archiving tool featuring Hero section and 2 CTA buttons.">
+        <a href="assets/demos/demo-aperture-site.html">
+          <img src="assets/demos/demo-aperture-site-1280.png" alt="離線歸檔工具產品落地頁，定格 Hero 視窗與 2 個 CTA 實體按鈕。">
         </a>
-        <figcaption><span class="kind">landing-page</span>Explicitly locked product category, driving conversion rate baseline up by 18% in 1 week.</figcaption>
+        <figcaption><span class="kind">landing-page</span>清楚標定工具類別，上線 1 週內轉換率刻度上揚 18%。</figcaption>
       </figure>
     </div>
-    <p class="sec-lede" style="margin-top:var(--space-6)">Clicking any of the 8 thumbnails renders the standalone HTML document. Zero external CSS dependencies, with shared code blocks maintaining 100% verbatim parity across all 16 templates.</p></div>
+    <p class="sec-lede" style="margin-top:var(--space-6)">點擊上述 8 份縮圖載入原始 HTML 實體。樣式無外部庫依賴，底層共用 CSS 在 16 份模板中維持 100% 逐字一致的位元鎖定。</p></div>
   </section>
 
 
   <section class="sec" id="s01">
-    <p class="sec-num">01 · USAGE</p>
-    <h2 class="sec-title">Physical Mapping from Prompt into HTML</h2>
-    <p class="sec-lede">Input intent string and the mechanism routes it in 1 step into 1 of 8 document types across Chinese or English.</p>
+    <p class="sec-num">01 · 用法</p>
+    <h2 class="sec-title">文字意圖至 HTML 的實體映射</h2>
+    <p class="sec-lede">輸入意圖字串，機制即將其在 1 個指令中分配至 8 種類型之一並分流至繁中或英文語軌。</p>
     <div class="sec-body"><div class="g2">
-      <div class="measure"><p>kage bounds 8 document types: one-pager, long-doc, equity-report, portfolio, letter, changelog, slides, and landing-page. Each type applies a JSON Schema contract to clamp text volume within hard capacity limits.</p><p style="margin-top:var(--space-4)">All 16 templates freeze as self-contained single HTML files, sharing 45 color tokens and CSS rules. Free of compilers or frameworks, outputs land directly into any browser engine.</p></div>
+      <div class="measure"><p>「影 · kage」覆蓋 8 種類型邊界：單頁摘要、長篇報告、個股研報、作品集、商務書信、更新日誌、簡報與產品頁。每種類型以 JSON Schema 內容契約做物理約束，將 AI 文案鎖定於字數上限內。</p><p style="margin-top:var(--space-4)">全數 16 份模板凝固為單檔自包含 HTML，共享 45 個色彩 token 與全域 CSS 阻尼。無編譯器或前端框架依賴，產出檔可直接落盤並在瀏覽器中讀取。</p></div>
       <aside class="cp-panel surf surf--card"><dl>
-        <dt>Input Intent</dt><dd>Input 1 natural language prompt, e.g. "Write v2.4.0 changelog for offline archiving tool with 3 highlights".</dd>
+        <dt>輸入意圖</dt><dd>輸入 1 段自然語言需求，如「撰寫離線歸檔工具 v2.4.0 更新日誌，包含 3 個重點變更」。</dd>
         <div class="decor-rule" aria-hidden="true"></div>
-        <dt style="margin-top:var(--space-4)">Output Artifact</dt><dd>Receive 1 fully styled HTML physical record embedding the tactile layout shared by all 16 templates.</dd>
+        <dt style="margin-top:var(--space-4)">產出物件</dt><dd>獲得 1 份完整排版的 HTML 實體，嵌入 16 份模板共通的質感阻尼與結構內容。</dd>
       </dl></aside>
     </div></div>
   </section>
 
 
   <section class="sec" id="s02">
-    <p class="sec-num">02 · MANIFESTO</p>
-    <h2 class="sec-title">Paper, Film, and the Physical World</h2>
-    <p class="sec-lede">3 physical constraints locking the texture and boundaries of digital documents.</p>
+    <p class="sec-num">02 · 宣言</p>
+    <h2 class="sec-title">紙張、底片與物理世界</h2>
+    <p class="sec-lede">3 條物理約束，鎖定數位文件的質地與邊界。</p>
     <div class="sec-body"><div class="measure">
-      <p class="t-lead">Rebuild physical touch: rejection of stark white or black, settling a 12.8 composite luma over #000000 base.</p>
-      <p class="t-lead" style="margin-top:var(--space-5)">Eliminate digital sharpness: using SD 7.4 achromatic noise and 18–30° light leak to absorb high-frequency glow.</p>
-      <p class="t-lead" style="margin-top:var(--space-5)">Restraint over decoration: motif hard-capped at 4 types, enforcing a 2-way mutual exclusivity rule for arc and scratch.</p>
+      <p class="t-lead">重建物理觸感：畫面拒絕純白與死黑，由 #000000 基色與顆粒沉澱為 12.8 合成明度。</p>
+      <p class="t-lead" style="margin-top:var(--space-5)">消除數位銳利度：藉由 SD 7.4 的無彩顆粒與 18–30° 漏光衰減，吸收螢幕的刺眼高頻訊號。</p>
+      <p class="t-lead" style="margin-top:var(--space-5)">克制勝於裝飾：裝飾語彙上限為 4 種，且弧線與刮痕實施 2 選 1 互斥門檻。</p>
     </div></div>
   </section>
 
 
   <section class="sec" id="s03">
-    <p class="sec-num">03 · COLOR</p>
-    <h2 class="sec-title">45 Tokens Mapping Optical Energy Spectrum</h2>
-    <p class="sec-lede">System anchors 45 color tokens to a single truth baseline. Base rendering at #000000 yields 12.8 composite luma after noise integration. Light leak hue is held at 18–30°, positioned outside frame boundaries.</p>
+    <p class="sec-num">03 · 色彩</p>
+    <h2 class="sec-title">45 個 Token 的光學紀錄譜</h2>
+    <p class="sec-lede">全系統 45 個色彩 token 寫死單一真相點。繪製基色 #000000 經顆粒疊加落地於 12.8 合成明度。漏光色相限制在 18–30° 暖色光波，能量核心置於畫面外，畫面內僅紀錄衰減尾幅。</p>
     <div class="sec-body">
   <div class="sw-group">
     <p class="t-label t-muted">基底與漏光<span class="sw-en">Base & Leak</span></p>
@@ -719,83 +719,83 @@ main { position: relative; z-index: 1; }
 
 
   <section class="sec" id="s04">
-    <p class="sec-num">04 · TYPOGRAPHY</p>
-    <h2 class="sec-title">Serif Typography for Print Material Tension</h2>
-    <p class="sec-lede">Loaded with self-hosted OFL-licensed Noto Serif TC, constraining headings and body to serif stroke geometry. Sans-serif retreats to 3 functional coordinates: navigation, dates, and serial numbers.</p>
+    <p class="sec-num">04 · 字體</p>
+    <h2 class="sec-title">襯線體刻印的紙張印刷張力</h2>
+    <p class="sec-lede">載入自架 OFL 授權 Noto Serif TC，標題與正文全數受襯線筆劃拘束。無襯線體退守至 3 個功能性位置：導覽、日期與序號。</p>
     <div class="sec-body"><div>
       <div class="ty-row">
         <span class="ty-meta decor-num">display · 64px</span>
-        <p class="t-display ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class="t-display ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">大標</span>
       </div>
       <div class="ty-row">
         <span class="ty-meta decor-num">h1 · 44px</span>
-        <p class="t-h1 ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class="t-h1 ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">章標</span>
       </div>
       <div class="ty-row">
         <span class="ty-meta decor-num">h2 · 30px</span>
-        <p class="t-h2 ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class="t-h2 ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">節標</span>
       </div>
       <div class="ty-row">
         <span class="ty-meta decor-num">h3 · 22px</span>
-        <p class="t-h3 ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class="t-h3 ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">小節</span>
       </div>
       <div class="ty-row">
         <span class="ty-meta decor-num">body-lead · 18px</span>
-        <p class="t-lead ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class="t-lead ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">導言</span>
       </div>
       <div class="ty-row">
         <span class="ty-meta decor-num">body · 16px</span>
-        <p class=" ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class=" ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">正文</span>
       </div>
       <div class="ty-row">
         <span class="ty-meta decor-num">small · 14px</span>
-        <p class="t-small ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class="t-small ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">附註</span>
       </div>
       <div class="ty-row">
         <span class="ty-meta decor-num">caption · 13px</span>
-        <p class="t-caption ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class="t-caption ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">圖說</span>
       </div>
       <div class="ty-row">
         <span class="ty-meta decor-num">label · 11px</span>
-        <p class="t-label ty-sample">Light attenuates at the border; typography establishes quiet order.</p>
+        <p class="t-label ty-sample">光的衰減落在畫面邊界，文字在靜謐中建立秩序。</p>
         <span class="ty-note t-caption t-muted">標籤</span>
       </div>
     </div>
-    <p class="sec-lede" style="margin-top:var(--space-6)">Serif letterforms create stroke resistance across 1280×800 viewports, arresting pixel bloom to establish tangible print tension.</p></div>
+    <p class="sec-lede" style="margin-top:var(--space-6)">襯線體筆劃末端形成物理抗力，在 1280×800 視窗中吸收光點擴散，構建如同實體印刷品般的紙張拉力。</p></div>
   </section>
 
 
   <section class="sec" id="s05">
-    <p class="sec-num">05 · MATERIAL</p>
-    <h2 class="sec-title">4 Layer Physical Stacked Background Architecture</h2>
-    <p class="sec-lede">Four physical layers stack the background: drawn base, warm leak, optional central sink, grain always topmost. Arcs and dust belong to the decorative vocabulary and are not counted among them.</p>
+    <p class="sec-num">05 · 材質</p>
+    <h2 class="sec-title">4 層物理堆疊的光影底板</h2>
+    <p class="sec-lede">背景由四層實體疊加：繪製基色、暖色漏光、可選的中央沉暗層，顆粒永遠置頂。弧線與塵點歸屬裝飾語彙，不計入層數。</p>
     <div class="sec-body"><div class="g2">
       <div class="measure">
-        <p>Solid screen pixels offer zero physical resistance. The renderer injects a 200×200 grayscale PNG noise texture, depositing a baseline luma standard deviation of 7.4.</p>
-        <p style="margin-top:var(--space-4)">Light leak intensity steps across 3 page hierarchy tiers: narrative tier caps at 24%/19%, while reading tier scales down to 10%/8%. Source sits outside frame, keeping center body luma strictly below 20.</p>
+        <p>純色像素缺乏物理抗力。機制載入固定種子生成的 200×200 灰階 PNG 顆粒，在繪製層沉澱出標準差 7.4 的無彩雜訊。</p>
+        <p style="margin-top:var(--space-4)">漏光能量按 3 類頁面階梯分級：敘事型高階設為 24%/19%，閱讀型抑制至 10%/8%。光源錨點留在畫面外，中央正文欄明度不越過 20 刻度。</p>
       </div>
       <aside class="cp-panel surf surf--card"><dl>
-        <dt>L1 · Drawn base</dt><dd>Pure black #000000. This is the colour actually painted, not the colour you see.</dd>
-        <dt>L2 · Warm leak</dt><dd>Screen blend. The core is anchored off-canvas; only the falloff enters the frame.</dd>
-        <dt>L3 · Central sink (optional)</dt><dd>Needed only over a full-bleed image. A flat base needs none — the centre is already darkest.</dd>
-        <dt>L4 · Film grain</dt><dd>Normal blend, always topmost. Composited luminance lands near 12.8.</dd>
+        <dt>L1 · 繪製基色</dt><dd>純黑 #000000。這是實際畫下去的顏色，不是你看到的顏色。</dd>
+        <dt>L2 · 暖色漏光</dt><dd>screen 疊加。核心錨定在畫面之外，畫面內只有衰減尾端。</dd>
+        <dt>L3 · 中央沉暗（選用）</dt><dd>只在背景是全幅影像時需要。純色底不需要 —— 中央本來就最暗。</dd>
+        <dt>L4 · 膠片顆粒</dt><dd>normal 混合，永遠最上層。合成後全圖明度約 12.8。</dd>
       </dl></aside>
     </div></div>
   </section>
 
 
   <section class="sec" id="s06">
-    <p class="sec-num">06 · MOTIFS</p>
-    <h2 class="sec-title">4 Physically Bounded Decorative Scale Vocabularies</h2>
-    <p class="sec-lede">Motif system clamps to 4 items: geometric lines/arcs, dust specks, mirrored ghosting, and edge micro-type. Arcs and scratches follow 2 mutually exclusive rules, with dust coverage bounded below 0.1%.</p>
+    <p class="sec-num">06 · 母題</p>
+    <h2 class="sec-title">4 種物理約束的裝飾刻度語彙</h2>
+    <p class="sec-lede">裝飾語彙限定於 4 種：幾何細線與弧線、塵點、鏡像重影與邊緣編目微型字。弧線與斷續刮痕實施 2 選 1 互斥規則，塵點面積阻尼在 0.1% 以下，防止雜訊干擾。</p>
     <div class="sec-body"><div class="g2" style="grid-template-columns:1fr 1fr">
       <figure class="mo">
         <div class="mo-stage"><div class="mo-arc" aria-hidden="true"></div></div>
@@ -817,63 +817,63 @@ main { position: relative; z-index: 1; }
 
 
   <section class="sec" id="s07">
-    <p class="sec-num">07 · COMPONENTS</p>
-    <h2 class="sec-title">Restrained UI Modules with Physical Hierarchy</h2>
-    <p class="sec-lede">Featuring 3 components: buttons, blockquotes, and paper surfaces, all passing the 4.5:1 contrast barrier.</p>
+    <p class="sec-num">07 · 元件</p>
+    <h2 class="sec-title">克制且具備層級感的 UI 模組</h2>
+    <p class="sec-lede">包含按鈕、引言區塊與紙張表面卡片 3 種元件，物理對比度均越過 4.5:1 門檻。</p>
     <div class="sec-body"><div class="g2">
       <div>
         <div class="cp">
-          <a class="btn btn-primary" href="https://github.com/workingyuanyuan/Kage">View Source<span aria-hidden="true">→</span></a>
-          <a class="btn btn-secondary" href="https://github.com/workingyuanyuan/Kage/blob/main/SKILL.md">Read Document</a>
+          <a class="btn btn-primary" href="https://github.com/workingyuanyuan/Kage">查看原始碼<span aria-hidden="true">→</span></a>
+          <a class="btn btn-secondary" href="https://github.com/workingyuanyuan/Kage/blob/main/SKILL.md">閱讀說明</a>
         </div>
-        <blockquote class="quote" style="margin-top:var(--space-6)">"Text bears structure, images bear atmosphere; restraint and order form the foundation of long-term legibility."</blockquote>
+        <blockquote class="quote" style="margin-top:var(--space-6)">「文字承擔結構，圖像承擔氣氛；克制與秩序才是長遠可讀性的基石。」</blockquote>
       </div>
       <aside class="cp-panel surf surf--paper">
-        <p class="t-small">Light paper surface cumulative area capped strictly within 25% bounds, hue coordinates held at 18–30°.</p>
+        <p class="t-small">淺色紙張表面累計面積硬性鎖定於 25% 上限內，色相座標停留在 18–30° 暖灰區間。</p>
       </aside>
     </div></div>
   </section>
 
 
   <section class="sec" id="s08">
-    <p class="sec-num">08 · ACCEPTANCE</p>
-    <h2 class="sec-title">8 Hard Quantifiable Automated Verification Checks</h2>
-    <p class="sec-lede">Build pipeline automatically verifies 8 physical metrics scales, ensuring all 16 template outputs pass tolerance tests.</p>
+    <p class="sec-num">08 · 驗收</p>
+    <h2 class="sec-title">8 條硬性可量化的自動檢查點</h2>
+    <p class="sec-lede">建置管線透過腳本自動校驗 8 項物理指標刻度，確保 16 份模板輸出通過阻尼測試。</p>
     <div class="sec-body"><ol class="chk">
       <li><span class="n">01</span>
-        <div><b>1. Reverse Vignetting Distribution</b><span>Luma of center 20% zone strictly bounded lower than outer 10% edge zone scale.</span></div></li>
+        <div><b>1. 反向暗角分佈</b><span>畫面中央 20% 區域明度硬性低於四周邊緣 10% 區域刻度。</span></div></li>
       <li><span class="n">02</span>
-        <div><b>2. Edge Stability</b><span>Cross-screenshot edge luma fluctuation amplitude clamped within ±10%.</span></div></li>
+        <div><b>2. 邊緣穩定度</b><span>跨截圖邊緣明度波動振幅必須阻尼在 ±10% 以內。</span></div></li>
       <li><span class="n">03</span>
-        <div><b>3. Luma Area Ratio</b><span>Luma ≥48 coverage < 4%, ≥80 < 0.15%, <32 ≥ 84%.</span></div></li>
+        <div><b>3. 明度面積佔比</b><span>明度 ≥48 面積比 < 4%、≥80 < 0.15%、<32 ≥ 84%。</span></div></li>
       <li><span class="n">04</span>
-        <div><b>4. Grain Standard Deviation</b><span>Overlaid grain luma standard deviation clamped to 6–14, baseline anchored at 7.4.</span></div></li>
+        <div><b>4. 顆粒標準差</b><span>疊加顆粒後明度標準差限制在 6–14 區間，基準定格於 7.4。</span></div></li>
       <li><span class="n">05</span>
-        <div><b>5. Three-Channel Achromatic Check</b><span>RGB three-channel residual amplitude variance bounded below 5% to lock noise neutrality.</span></div></li>
+        <div><b>5. 三通道無彩驗證</b><span>RGB 三通道殘差振幅差異必須低於 5% 阻尼刻度，保持顆粒無彩。</span></div></li>
       <li><span class="n">06</span>
-        <div><b>6. Clean Region Low-Frequency Residual</b><span>Clean area 64/128px scale residual held under 0.7 threshold to eliminate low-frequency mottling.</span></div></li>
+        <div><b>6. 乾淨區低頻殘差</b><span>乾淨區域 64/128px 尺度殘差必須抑制在 0.7 以下，消解低頻斑駁。</span></div></li>
       <li><span class="n">07</span>
-        <div><b>7. Background Hue Range</b><span>Background hue coordinates bounded exclusively to 18–30° or 180–192° paths.</span></div></li>
+        <div><b>7. 背景色相區間</b><span>背景色相座標嚴格鎖定落在 18–30° 暖色或 180–192° 冷灰通道。</span></div></li>
       <li><span class="n">08</span>
-        <div><b>8. Body Column Luma Constraint</b><span>Body column low-frequency luma p99 ≤ 20 and p99−p1 ≤ 8, damping luma drift.</span></div></li>
+        <div><b>8. 正文欄明度約束</b><span>正文欄低頻明度 p99 ≤ 20 且 p99−p1 ≤ 8，阻尼低頻明度漂移。</span></div></li>
     </ol></div>
   </section>
 
 
   <section class="sec" id="s09">
-    <p class="sec-num">09 · QUESTIONS</p>
-    <h2 class="sec-title">Frequently Asked Questions on Physical Mechanisms of kage</h2>
-    <p class="sec-lede">Deconstructing 4 mechanism questions on positioning, output scope, optics, and develop mode.</p>
+    <p class="sec-num">09 · 問答</p>
+    <h2 class="sec-title">關於「影 · kage」的實體機制問答</h2>
+    <p class="sec-lede">解析定位、生成範疇、光學來源與顯影模式的 4 個機制疑問。</p>
     <div class="sec-body"><dl class="qa">
-      <dt>1. What is kage?</dt><dd>kage is an AI Agent Skill mapping inputs into physical HTML documents. It locks 16 templates and 45 color tokens into a standalone design system baseline.</dd>
-      <dt>2. What can kage generate?</dt><dd>Outputs 8 document types: one-pager, long-doc, equity-report, portfolio, letter, changelog, slides, and landing-page, total 16 pure screen HTML templates in Chinese and English.</dd>
-      <dt>3. What is the core aesthetic philosophy?</dt><dd>Texture originates from physical silver-halide film stocks. By mapping a #000000 base, 7.4 SD noise, and 18–30° light leak decay, digital frequency translates into analog optical exposure.</dd>
-      <dt>4. What is Develop Mode?</dt><dd>Develop Mode projects abstract assertions into objective physical scales. It remains in a disabled state by default, requiring explicit user prompt commands to unlock physical translation.</dd>
+      <dt>1. 「影 · kage」是什麼？</dt><dd>「影 · kage」是引導 AI Agent 輸入至 HTML 實體的文件生成 Skill。它錨定 16 份模板與 45 個色彩 token 的物理結構，作為設計系統展示基準。</dd>
+      <dt>2. 「影 · kage」能生成什麼？</dt><dd>覆蓋 8 種類型實體：單頁摘要、長篇報告、個股研報、作品集、商務書信、更新日誌、簡報與產品頁，繁中與英文共 16 份純螢幕 HTML 模板。</dd>
+      <dt>3. 核心美學精神是什麼？</dt><dd>質感來自底片膠卷與老電影的物理光影。藉由 #000000 基色、7.4 標準差無彩顆粒與 18–30° 邊緣漏光衰減，將像素高頻光點轉譯為銀鹽感光層上的沉澱記錄。</dd>
+      <dt>4. 什麼是顯影模式？</dt><dd>顯影模式將抽象宣示降維至客觀物理刻度。該語域屬於罕用狀態，預設為關閉，需使用者在指令中輸入明確指定方可解鎖實體對應轉譯。</dd>
     </dl></div>
   </section>
 
   <footer class="foot t-meta">
-    <span>kage · 2026 · MIT</span>
+    <span>影 · kage · 2026 · MIT</span>
     <span>
       <a href="https://github.com/workingyuanyuan/Kage">原始碼</a> ·
       <a href="https://github.com/workingyuanyuan/Kage/blob/main/SKILL.md">說明文件</a> ·
