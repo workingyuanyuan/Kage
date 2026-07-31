@@ -102,13 +102,39 @@ export async function captureCDP(chrome, fileUrl, { width, height, out, fullPage
     // 逐框輸出。設計語言的參考框是「單一可視框」而非文件總長度 —— 一道漏光
     // 拉伸成 3900px 不是任何讀者看得到的構圖，中央沉暗只在一個框內成立。
     // 所以長文件的正確影像是 N 個等高的框，每一框都帶正確的背景。
+    //
+    // 「一框」由文件自己的分頁方向決定，不是永遠垂直。slides 的 .deck 是
+    // `scroll-snap-type: x mandatory` 的水平捲動容器：文件高度剛好一個視窗，
+    // 垂直切框永遠只出 f01，第 2 頁之後不可達。所以先問頁面往哪個方向分頁，
+    // 再照那個方向走 —— 這是讓既有旗標對所有模板都成立，不是新增模式。
     if (frames) {
       await send('Runtime.enable');
+      const probe = `(() => {
+        for (const el of document.querySelectorAll('*')) {
+          const t = getComputedStyle(el).scrollSnapType || '';
+          if (/^x[\\s]|^x$/.test(t) && el.scrollWidth > el.clientWidth + 1) {
+            window.__kageDeck = el;
+            // 捲動動畫會讓截圖拍到中間幀，量測期間關掉。
+            el.style.scrollBehavior = 'auto';
+            return { horizontal: true, n: Math.round(el.scrollWidth / el.clientWidth) };
+          }
+        }
+        return { horizontal: false };
+      })()`;
+      const { result } = await send('Runtime.evaluate', { expression: probe, returnByValue: true });
+      const deck = result.value ?? { horizontal: false };
+
       const { cssContentSize } = await send('Page.getLayoutMetrics');
-      const n = Math.max(1, Math.ceil(cssContentSize.height / height));
+      const n = deck.horizontal
+        ? Math.max(1, deck.n)
+        : Math.max(1, Math.ceil(cssContentSize.height / height));
       const outs = [];
       for (let i = 0; i < n; i++) {
-        await send('Runtime.evaluate', { expression: `window.scrollTo(0, ${i * height})` });
+        await send('Runtime.evaluate', {
+          expression: deck.horizontal
+            ? `window.__kageDeck.scrollLeft = ${i} * window.__kageDeck.clientWidth`
+            : `window.scrollTo(0, ${i * height})`,
+        });
         await sleep(120);
         const { data } = await send('Page.captureScreenshot', { format: 'png' });
         const p = out.replace(/\.png$/, `-f${String(i + 1).padStart(2, '0')}.png`);

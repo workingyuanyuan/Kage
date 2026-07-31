@@ -207,7 +207,7 @@ export function evaluate(shots, opts = {}) {
     add(2, '跨截圖邊緣穩定度 ≤ ±10%', spread <= 10,
         `${es.map(v => v.toFixed(1)).join(' / ')} → 極差 ${spread.toFixed(1)}%`);
   } else {
-    add(2, '跨截圖邊緣穩定度 ≤ ±10%', true, '只有一張截圖，需三張以上才能驗', true);
+    add(2, '跨截圖邊緣穩定度 ≤ ±10%', true, '只有一張截圖，需兩張以上才能驗', true);
   }
 
   // 三條面積帶是規格的實質控制，最大值只報不判。
@@ -238,9 +238,24 @@ export function evaluate(shots, opts = {}) {
   add(6, '乾淨區 64/128px 殘差 < 0.7', m.res64 < 0.7 && m.res128 < 0.7,
       `64px ${m.res64.toFixed(2)} · 128px ${m.res128.toFixed(2)}（參考：32px ${m.res32.toFixed(2)}）`);
 
-  add(7, '背景色相僅落在 18–30° 或 180–192°', bgOnly && m.hueBadPct < 1,
-      `chroma ≥12 的像素 ${m.hueOK + m.hueBad} 個 · 違規 ${m.hueBad}（${m.hueBadPct.toFixed(2)}%）`,
-      !bgOnly);
+  // 這條的分母會塌，塌了就不能判。它問的是「有彩像素裡有幾成跑出色帶」，
+  // 而有彩像素的數量隨頁型與寬度差兩個數量級：1280 的 C 級有 147,002 個，
+  // 375 的 C 級只剩約 400 個 —— 手機斷點把 --leak-a 降到 6%，漏光的水平半徑
+  // 又是 min(55vw, 900px)，375 下只有 206px。分母一塌，三十幾個顆粒尖端的
+  // 離群像素就把比例推到 9%，但它們佔全圖僅 0.01%，與 1280 下的絕對量同級。
+  // 實測 375：十份 C 級樣本全數報紅（7.10–12.66%），六份 A 級全數通過（0.01%）。
+  // 量到的是分母，不是背景。
+  //
+  // 真有色偏時這條仍然會判：色偏意味著大片像素帶彩，分母自然回到門檻之上。
+  // 被跳過的只有「幾乎沒有有彩像素」那種情況，而那本來就沒有色偏可言。
+  // 照第 5 條的先例：振幅／基數不足就標為無定義，不在這裡誤判。
+  const huePop = m.hueOK + m.hueBad;
+  const hueMeasurable = huePop >= m.width * m.height * 0.02;
+  add(7, '背景色相僅落在 18–30° 或 180–192°', bgOnly && hueMeasurable && m.hueBadPct < 1,
+      !hueMeasurable
+        ? `chroma ≥12 的像素僅 ${huePop} 個，不足全圖 2% —— 漏光在此尺寸過弱，比例無定義`
+        : `chroma ≥12 的像素 ${huePop} 個 · 違規 ${m.hueBad}（${m.hueBadPct.toFixed(2)}%）`,
+      !bgOnly || !hueMeasurable);
 
   // 這條是閱讀型的約束：正文要坐在均勻的暗場上。預設欄界「置中、寬 --measure」
   // 是 C 級的版式規則。

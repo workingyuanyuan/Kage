@@ -11,3 +11,5 @@ Thumbs.db
 # 煙霧測試與驗證用截圖（site/img/ 的圖庫素材要入庫）
 assets/_smoke/
 site/index*.png
+.kage-sample/
+test-temp/

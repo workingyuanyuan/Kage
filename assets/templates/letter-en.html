@@ -308,6 +308,20 @@ main { position: relative; z-index: 1; }
                     font-size: 12px; }
 .plate-num  { font-family: var(--mono); font-weight: 600; color: var(--color-text-emphasis); }
 
+/* 缺圖態：素材還沒到位時，把 <img> 換成這一組，不要留空也不要填替代圖。
+   佔位高度必須與真圖相當 —— portfolio 的 .hero-title-bleed 是負邊距交疊構圖，
+   plate 一矮，標題就砸在圖說上。aspect-ratio 預設 4:3（既有素材的比例），
+   實際素材不是這個比例時就地覆寫，例如 style="aspect-ratio:16/9"。
+   底色用 background-deep 而非紙張色：一整片亮紙會蓋過頁面上真正的內容。
+   說明文字沿用 design.md 的方括號缺口記法，`kage placeholders` 才撿得到。 */
+.plate-wrap--gap { aspect-ratio: 4 / 3; display: flex; align-items: center;
+                   justify-content: center; padding: var(--space-6);
+                   background: var(--color-background-deep);
+                   border: 1px dashed var(--color-border-on-dark); }
+.plate-gap  { font-family: var(--mono); font-size: 13px; line-height: 1.7;
+              letter-spacing: .04em; text-align: center;
+              color: var(--color-text-muted-on-dark); }
+
 /* ── 焦點與高對比 ── */
 :focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 3px; }
 @media (forced-colors: active) {

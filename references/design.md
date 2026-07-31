@@ -271,6 +271,30 @@
 
 圖說寫**判斷**而非資料範圍：「營收在 Q3 轉正」勝過「2023–2025 年營收」。
 
+**缺圖態。** 素材還沒到位時把 `<img>` 整個換掉，不留空、不填替代圖：
+
+```html
+<figure class="plate"><div class="plate-wrap plate-wrap--gap">
+    <p class="plate-gap">[需要資料：封面主視覺，建議 4:3、長邊 ≥ 1600px]</p></div>
+  <figcaption><span class="plate-num">COVER</span>圖說照常寫完</figcaption></figure>
+```
+
+```css
+.plate-wrap--gap { aspect-ratio:4/3; display:flex; align-items:center; justify-content:center;
+                   padding:var(--space-6); background:var(--color-background-deep);
+                   border:1px dashed var(--color-border-on-dark); }
+.plate-gap  { font-family:var(--mono); font-size:13px; line-height:1.7;
+              letter-spacing:.04em; text-align:center; color:var(--color-text-muted-on-dark); }
+```
+
+三件事是這個設計的重點，改動前先讀懂：
+
+- **佔位高度必須與真圖相當。** portfolio 的 `.hero-title-bleed` 是 `margin-top: calc(var(--space-10) * -1)` 的負邊距交疊構圖，它成立的前提是 plate 有高度。缺圖時若只放一行矮字，plate 塌陷，標題會砸在圖說上。`aspect-ratio` 預設 4:3 是既有素材的比例；實際素材不是這個比例時就地覆寫（`style="aspect-ratio:16/9"`）。
+- **底色用 `--color-background-deep`，不用紙張色。** 一整片亮紙是頁面上最亮的東西，會蓋過真正的內容；暗場填色的明度接近多數實際影像。
+- **說明沿用 `[需要資料：…]` 記法，且必須是單一文字節點。** `kage placeholders` 用 `/\[需要資料[：:][^\]]{1,80}\]/` 撿缺口，把「需要資料」拆進 `<b>` 之類的子元素就撿不到，交付訊息的缺口清單會漏報。
+
+目前有圖位的模板：portfolio 5 個、landing-page 2 個、one-pager / long-doc / equity-report 各 1 個，`-en` 版相同。
+
 ### 3.5 表格
 
 無外框，只用橫向分隔線，表頭加一道橘棕頂線。**寬表必須包一層 `overflow-x: auto` 容器並給 `min-width`**，讓表格自己捲動，不得讓整頁溢出。

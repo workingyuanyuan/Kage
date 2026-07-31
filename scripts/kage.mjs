@@ -29,7 +29,22 @@ const has = f => rest.includes(f);
 const val = (f, d) => { const i = rest.indexOf(f); return i < 0 ? d : rest[i + 1]; };
 // 取「不是旗標、也不是某個帶值旗標的值」的參數。逐一列出帶值旗標，
 // 否則 `--widths 1280,375` 的 1280,375 會被當成檔名。
-const VALUED = new Set(['--column', '--widths', '--tier', '--out', '--height']);
+const VALUED = new Set(['--column', '--widths', '--tier', '--height']);
+const BOOLEAN = new Set(['--bg-only', '--content', '--frames', '--full', '--write']);
+
+// 未知旗標一律報錯，不靜默忽略。
+//
+// `--out` 曾經列在 VALUED 卻沒有任何命令讀它：`shot 頁面.html --out 別的.png`
+// 會安靜地寫到預設路徑，而預設路徑就在來源檔旁邊 —— 實測因此覆蓋掉一張已入庫的
+// demo 截圖。打錯的旗標（`--width`、`--bgonly`）是同一種壞法：使用者以為自己
+// 指定了行為，工具卻做了別的事還回報成功。
+const unknown = rest.filter(a => a.startsWith('--') && !VALUED.has(a) && !BOOLEAN.has(a));
+if (unknown.length) {
+  console.error(`未知旗標：${unknown.join(' ')}`);
+  console.error(`帶值：${[...VALUED].join(' ')}　開關：${[...BOOLEAN].join(' ')}`);
+  process.exit(2);
+}
+
 const files = rest.filter((a, i) => !a.startsWith('--') && !VALUED.has(rest[i - 1]));
 
 const OK = '  ✓', NO = '  ✗';
