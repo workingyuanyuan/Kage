@@ -21,18 +21,18 @@ Material carries the atmosphere; text carries the structure. That division is al
 
 One document per type, every one a real render. Click a thumbnail to open the full file.
 
-| Type | Preview | Subject |
+| Type | Preview | Ask for it like this |
 |---|---|---|
-| one-pager | [![One-pager](assets/demos/demo-archive-proposal-en-1280.png)](assets/demos/demo-archive-proposal-en.html) | A municipal archive's proposal to move paper filing online |
-| long-doc | [![Long document](assets/demos/demo-index-engine-en-1280.png)](assets/demos/demo-index-engine-en.html) | Architecture decision record for an offline full-text index engine |
-| equity-report | [![Equity report](assets/demos/demo-packaging-equity-en-1280.png)](assets/demos/demo-packaging-equity-en.html) | Research report on a fictional semiconductor packaging firm |
-| portfolio | [![Portfolio](assets/demos/demo-document-portfolio-en-1280.png)](assets/demos/demo-document-portfolio-en.html) | A document and typographic design portfolio |
-| letter | [![Letter](assets/demos/demo-review-notice-en-1280.png)](assets/demos/demo-review-notice-en.html) | Annual review notice on preservation conditions |
-| changelog | [![Changelog](assets/demos/demo-aperture-changelog-en-1280.png)](assets/demos/demo-aperture-changelog-en.html) | Release notes for a fictional offline archiving tool |
-| slides | [![Slides](assets/demos/demo-legibility-talk-en-1280.png)](assets/demos/demo-legibility-talk-en.html) | A talk on the long-term legibility of static files |
-| landing-page | [![Landing page](assets/demos/demo-aperture-site-en-1280.png)](assets/demos/demo-aperture-site-en.html) | That tool's product page |
+| one-pager | [![One-pager](assets/demos/demo-archive-proposal-en-1280.png)](assets/demos/demo-archive-proposal-en.html) | "Write me a one-pager: the city archive wants to move paper filing online" |
+| long-doc | [![Long document](assets/demos/demo-index-engine-en-1280.png)](assets/demos/demo-index-engine-en.html) | "Turn the architecture decisions behind our offline full-text index engine into a long technical document" |
+| equity-report | [![Equity report](assets/demos/demo-packaging-equity-en-1280.png)](assets/demos/demo-packaging-equity-en.html) | "Put together an equity report on a semiconductor packaging firm — target price and downside risks included" |
+| portfolio | [![Portfolio](assets/demos/demo-document-portfolio-en-1280.png)](assets/demos/demo-document-portfolio-en.html) | "Make me a portfolio of my document and typographic design work" |
+| letter | [![Letter](assets/demos/demo-review-notice-en-1280.png)](assets/demos/demo-review-notice-en.html) | "Draft a formal notice: results of the annual preservation review" |
+| changelog | [![Changelog](assets/demos/demo-aperture-changelog-en-1280.png)](assets/demos/demo-aperture-changelog-en.html) | "Turn these releases into proper release notes" |
+| slides | [![Slides](assets/demos/demo-legibility-talk-en-1280.png)](assets/demos/demo-legibility-talk-en.html) | "Build a deck on the long-term legibility of static files" |
+| landing-page | [![Landing page](assets/demos/demo-aperture-site-en-1280.png)](assets/demos/demo-aperture-site-en.html) | "Make a product landing page for this offline archiving tool" |
 
-Every company, person and figure in the demos is invented, and exists only to show the layout.
+The right column is what to say to get a document of that kind — not the verbatim input behind each demo. Every company, person and figure in the demos is invented, and exists only to show the layout.
 
 ## Install
 
@@ -53,9 +53,38 @@ Two requirements:
 
 ## Usage
 
-On the agent's side: take the brief → pick a type → verify sources and material gaps → settle the register and the page tier → write the draft against its content contract → pour it into the template → verify. When material is missing, the gap gets marked on the page and no stand-in fills it.
+Once it is installed, just say what you want in plain language. **You do not name the type** — say what the document is for and the agent picks. It asks only when two types genuinely both fit.
 
-Commands you can run yourself:
+```
+Turn these meeting notes into a one-pager for my manager
+```
+
+Common ways to ask:
+
+| What you want | Say something like |
+|---|---|
+| A proposal or exec summary that fits on one page | "Write me a proposal, one page only: \<topic\>" |
+| White paper, technical document, annual wrap-up | "Turn this into a long technical document, two or three thousand words" |
+| Formal letter, reference, resignation | "Draft a formal notice: \<subject\>" |
+| Portfolio, case studies | "Make a portfolio out of these three projects" |
+| Changelog, release notes | "Turn these releases into proper release notes" |
+| Equity report, investment memo | "Write an equity report on \<company\>, with a target price and the risks" |
+| Deck | "Build a deck on \<topic\>, about five slides" |
+| Landing page, product site | "Make a product page for \<product\>, with pricing and an FAQ" |
+| In Traditional Chinese | Add "in Chinese" to any of the above |
+| Re-typeset something you already have | "This looks awful, lay it out properly" + paste the content or give a file path |
+
+**Hand over whatever material you have.** Drafts, figures, brand logos, product screenshots — attach them or give paths.
+
+**It will not invent what it does not have.** When a logo, product shot or figure is missing, the agent comes back once with a short gap list, and leaves the gap marked on the page as `[需要資料：…]` — no stock mood imagery, no redrawn approximations of a logo, no made-up numbers.
+
+**What you get at handover**: the file path, which checks ran and what they said, every unfilled gap listed one by one, and a verdict on how the page looks at 1280 and 375.
+
+**Say so if something looks off.** The agent names the element and its current value, then offers two options that are still within spec. If the same spot goes two rounds without landing, it stops nudging numbers and builds an A/B/C comparison for you to pick from.
+
+### What runs before it calls the job done
+
+The agent runs these itself; you do not need to remember them. They are listed so you know what "done" was checked against:
 
 ```bash
 node scripts/kage.mjs check                       # shared CSS block, colour tokens, template lint, content contracts
@@ -66,13 +95,7 @@ node scripts/kage.mjs shot <file.html> --bg-only  # background layer only
 node scripts/kage.mjs bg <background.png>         # eight pixel checks on the background layer
 ```
 
-Long documents also come out frame by frame:
-
-```bash
-node scripts/kage.mjs shot <file.html> --height 1800 --frames
-```
-
-The reference frame for this design language is a single visible frame, never the full length of a document. Stretch one light leak across 3900px and you get a composition no reader ever sees. So the correct image of a long document is N frames of equal height, each carrying the whole background.
+Long documents and decks also come out frame by frame (`shot <file.html> --frames`). The reference frame for this design language is a single visible frame, never the full length of a document: stretch one light leak across 3900px and you get a composition no reader ever sees. So the correct image of a long document is N frames of equal height, each carrying the whole background — and of a deck, one frame per slide.
 
 ## Design
 

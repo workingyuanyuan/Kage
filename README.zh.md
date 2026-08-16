@@ -21,18 +21,18 @@
 
 八種類型各一份，全是實際產出。點縮圖開完整文件。
 
-| 類型 | 預覽 | 題材 |
+| 類型 | 預覽 | 這樣說就會得到這一類 |
 |---|---|---|
-| one-pager | [![單頁方案](assets/demos/demo-archive-proposal-1280.png)](assets/demos/demo-archive-proposal.html) | 市立文獻館的紙本歸檔上線提案 |
-| long-doc | [![長篇報告](assets/demos/demo-index-engine-1280.png)](assets/demos/demo-index-engine.html) | 離線全文索引引擎的架構決策紀錄 |
-| equity-report | [![個股研報](assets/demos/demo-packaging-equity-1280.png)](assets/demos/demo-packaging-equity.html) | 虛構半導體封測公司的研究報告 |
-| portfolio | [![作品集](assets/demos/demo-document-portfolio-1280.png)](assets/demos/demo-document-portfolio.html) | 文件與排版設計作品集 |
-| letter | [![正式書信](assets/demos/demo-review-notice-1280.png)](assets/demos/demo-review-notice.html) | 保存環境的年度覆核通知 |
-| changelog | [![更新日誌](assets/demos/demo-aperture-changelog-1280.png)](assets/demos/demo-aperture-changelog.html) | 虛構離線歸檔工具的版本紀錄 |
-| slides | [![簡報](assets/demos/demo-legibility-talk-1280.png)](assets/demos/demo-legibility-talk.html) | 靜態檔案長期可讀性的演講 |
-| landing-page | [![產品落地頁](assets/demos/demo-aperture-site-1280.png)](assets/demos/demo-aperture-site.html) | 該工具的產品頁 |
+| one-pager | [![單頁方案](assets/demos/demo-archive-proposal-1280.png)](assets/demos/demo-archive-proposal.html) | 「幫我做份提案，一頁紙就好：市立文獻館要把紙本歸檔搬上線」 |
+| long-doc | [![長篇報告](assets/demos/demo-index-engine-1280.png)](assets/demos/demo-index-engine.html) | 「把離線全文索引引擎的架構決策整理成一份技術長文」 |
+| equity-report | [![個股研報](assets/demos/demo-packaging-equity-1280.png)](assets/demos/demo-packaging-equity.html) | 「幫我做一份個股研報，標的是半導體封測廠，要有目標價和下行風險」 |
+| portfolio | [![作品集](assets/demos/demo-document-portfolio-1280.png)](assets/demos/demo-document-portfolio.html) | 「做個作品集，收我這幾年的文件與排版設計案子」 |
+| letter | [![正式書信](assets/demos/demo-review-notice-1280.png)](assets/demos/demo-review-notice.html) | 「幫我寫一封正式通知信：保存環境的年度覆核結果」 |
+| changelog | [![更新日誌](assets/demos/demo-aperture-changelog-1280.png)](assets/demos/demo-aperture-changelog.html) | 「把這幾版的變更整理成 release notes」 |
+| slides | [![簡報](assets/demos/demo-legibility-talk-1280.png)](assets/demos/demo-legibility-talk.html) | 「做一份簡報，講靜態檔案的長期可讀性」 |
+| landing-page | [![產品落地頁](assets/demos/demo-aperture-site-1280.png)](assets/demos/demo-aperture-site.html) | 「幫這個離線歸檔工具做一個產品落地頁」 |
 
-示範裡的公司、人物與數據全部虛構，只用於呈現版面。
+右欄是照著說就會得到同一類文件的說法，不是示範檔的逐字原始輸入。示範裡的公司、人物與數據全部虛構，只用於呈現版面。
 
 ## 安裝
 
@@ -53,9 +53,38 @@ git clone https://github.com/workingyuanyuan/Kage.git
 
 ## 使用
 
-代理側的流程：接到需求 → 選類型 → 核實來源與素材缺口 → 定語域與頁型分級 → 依內容契約寫稿 → 澆進模板 → 驗證。素材缺了就在版面上標成缺口，不填替代品。
+裝好之後就用平常說話的方式開口。**不必指定類型**——說用途，代理自己判斷要做成哪一種；只有兩種類型真的都成立時才會問你一句。
 
-人可以直接跑的指令：
+```
+幫我把這份會議記錄整理成一頁紙，給主管看
+```
+
+常見的說法：
+
+| 你想要的 | 這樣說 |
+|---|---|
+| 一頁講完的提案、執行摘要 | 「幫我做份提案，一頁紙就好：<主題>」 |
+| 白皮書、技術文件、年度總結 | 「把這些整理成一份技術長文，兩三千字」 |
+| 正式書信、推薦信、辭呈 | 「幫我寫一封正式通知信：<事由>」 |
+| 作品集、案例研究 | 「做個作品集，收這三個案子」 |
+| 更新日誌、版本紀錄 | 「把這幾版的變更整理成 release notes」 |
+| 個股研報、投資備忘 | 「幫我做一份個股研報，標的 <公司>，要有目標價與風險」 |
+| 簡報 | 「做一份簡報講 <主題>，大概五頁」 |
+| 產品落地頁、官網 | 「幫 <產品> 做一個產品頁，要有定價和 FAQ」 |
+| 英文版 | 上面任何一句加「用英文」 |
+| 重排既有文件 | 「這份看起來太醜了，幫我排一下」＋貼上內容或給檔案路徑 |
+
+**手上有的素材一起給。** 草稿、數據、品牌標誌、產品截圖，直接附上或給路徑。
+
+**沒有的東西它不會編。** 缺標誌、缺產品圖、缺數字時，代理會回一張精簡的缺口表問你一次，並把缺口留在版面上標成 `[需要資料：…]`——不用無關的意境圖，不重繪近似標誌，不編造數值。
+
+**交件時你會拿到**：檔案路徑、跑了哪些檢查與結果、還沒填的缺口逐條列出，以及 1280 與 375 兩個寬度的畫面結論。
+
+**回饋就直說。** 覺得哪裡怪，代理會指名那個元素與它當前的值，給你兩個仍在規格內的選項；同一處調兩輪還沒過，它會改成做一張 A/B/C 對照圖讓你挑。
+
+### 交付前會跑的檢查
+
+這些是代理自己跑的，你不需要記。列出來是為了說清楚「完成」背後被驗過什麼：
 
 ```bash
 node scripts/kage.mjs check                        # 共用 CSS 區塊、色彩 token、模板 lint、內容契約
@@ -66,13 +95,7 @@ node scripts/kage.mjs shot <檔案.html> --bg-only    # 只有背景層的截圖
 node scripts/kage.mjs bg <背景截圖.png>              # 背景層八條像素驗收
 ```
 
-長文件另有逐框輸出：
-
-```bash
-node scripts/kage.mjs shot <檔案.html> --height 1800 --frames
-```
-
-這套設計語言的參考框是單一可視框，不是文件總長度。一道漏光拉伸成 3900px，沒有任何讀者看得到那個構圖。所以長文件的正確影像是 N 個等高的框，每框各自帶完整的背景。
+長文件與簡報另有逐框輸出（`shot <檔案.html> --frames`）。這套設計語言的參考框是單一可視框，不是文件總長度：一道漏光拉伸成 3900px，沒有任何讀者看得到那個構圖。所以長文件的正確影像是 N 個等高的框，每框各自帶完整的背景；簡報則是一頁一框。
 
 ## 設計
 
