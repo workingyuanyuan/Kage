@@ -493,6 +493,35 @@ body.leak-alt .bg-alt { opacity: 1; }
   .slide { padding: var(--space-10) var(--space-4) var(--space-8); }
   .deck-ui { right: var(--space-4); bottom: var(--space-4); }
 }
+/* ── 大螢幕：把版面還原成設計基準的比例 ──
+   每個 clamp 在 viewport 1200px 就頂到上限，之後這份簡報完全停止縮放。
+   實測 1920 與 3840 的算圖逐值相同（標題 72px、內文 18px、內容欄 1200px）——
+   4K 上等於把 1280 的版面原尺寸畫進四倍面積，內容欄只剩畫面寬的 31%。
+   簡報是填滿畫面的表面，不是有固定行寬的閱讀文件，超過基準寬就該等比長回去。
+   基準取 1280：clamp 在那裡到頂，且內容欄佔畫面 93.8%。倍率＝viewport ÷ 1280，
+   取 0.25 級距，3840 剛好 3×。
+
+   用 zoom 而不是逐條改 font-size：px 值散在字級、間距、微型字與按鈕四處，
+   逐條改必然漏（實測漏掉的眉標與頁腳會脫離層級），而 --space-* 住在 BASE，
+   動它會波及其餘七種文件。zoom 是唯一一次涵蓋全部的槓桿。
+
+   這裡用它是安全的：.bg-fixed 與 .deck-ui 都是 .deck 的兄弟節點，所以漏光與顆粒
+   維持 1:1、操作列不跟著放大 —— 這正是瀏覽器整頁縮放做不到的，那會把 200×200
+   的顆粒圖一起拉伸，顆粒糊掉發髒。
+
+   高度必須除回去：zoom 內的 100dvh 先對未縮放的視窗求值再被放大，deck 會溢出畫面。
+   只掛 screen：列印有自己的一頁一張版式，不套縮放。 */
+.deck  { zoom: var(--deck-zoom, 1); height: calc(100dvh / var(--deck-zoom, 1)); }
+.slide { height: calc(100dvh / var(--deck-zoom, 1)); }
+@media screen and (min-width: 1600px) { .deck { --deck-zoom: 1.25; } }
+@media screen and (min-width: 1920px) { .deck { --deck-zoom: 1.5;  } }
+@media screen and (min-width: 2240px) { .deck { --deck-zoom: 1.75; } }
+@media screen and (min-width: 2560px) { .deck { --deck-zoom: 2;    } }
+@media screen and (min-width: 2880px) { .deck { --deck-zoom: 2.25; } }
+@media screen and (min-width: 3200px) { .deck { --deck-zoom: 2.5;  } }
+@media screen and (min-width: 3520px) { .deck { --deck-zoom: 2.75; } }
+@media screen and (min-width: 3840px) { .deck { --deck-zoom: 3;    } }
+
 /* 列印：每頁一張，停用捲動與固定層 */
 @media print {
   .deck { display: block; height: auto; overflow: visible; }
