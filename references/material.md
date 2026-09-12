@@ -8,7 +8,7 @@
 
 ## 0. 不變量
 
-八條，不可協商。
+以下定義 Kage 的背景與色彩基準；修改相關材質時使用。
 
 1. **繪製色是純黑，`#0d0d0d` 是合成結果。** 所有深色色碼都是疊上顆粒後的目標輸出值，不是任何一層的繪製色。把 `#0d0d0d` 當 `background-color` 再疊顆粒會重複計算一次提亮量，成品明度約為目標的 1.5 倍。
 2. **顆粒不可削弱。** 每個畫面都必須覆蓋一層肉眼可辨識的細顆粒，且不得加入閃爍或位移動畫。可讀性一律靠局部遮罩解決，不得全域調低顆粒。
@@ -172,7 +172,7 @@ mean 與 SD 被同一個 `opacity` 縮放，故輸出的 SD/mean 恆等於噪點
 
 ## 2. 色彩
 
-完整 token 定義在 `references/tokens.json`，是唯一真相。模板的 `:root` 必須與它一致，由 `scripts/tokens.py --sync` 把關。
+完整色彩 token 定義在 `references/tokens.json`。模板的 `:root` 須與它一致，由 `node scripts/kage.mjs tokens` 檢查；共用修改流程見 [production.md](production.md)「模板庫維護」。
 
 ### 2.1 調色盤
 

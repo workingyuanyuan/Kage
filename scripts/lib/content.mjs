@@ -1,7 +1,7 @@
-// 內容契約：把稿子倒進模板之前先驗語意形狀。
+// 內容契約：選用既有模板結構時，檢查稿件形狀與容量。
 //
 // schema 不是「欄位對應表」—— 模板的 {{}} 是寫給人／代理看的指示，不是機器鍵。
-// 這裡驗的是「該有的內容有沒有、長度落不落在該有的區間」，是澆版前的閘門。
+// 這裡驗欄位、項目數與字元長度；自訂文件的結構與實際排版另行檢查。
 //
 // 自帶一個 JSON Schema draft-07 的子集實作。用到的關鍵字就這些，
 // 為了一份 8 檔的契約去背一個 npm 依賴不划算。
@@ -97,7 +97,7 @@ export function lintSchema(schema, file) {
  * 檢查 schemas/ 與 templates/ 的類型集合一致 —— 少一份就是有類型沒有契約。
  *
  * 語軌不影響內容形狀：`one-pager-en` 與 `one-pager` 是同一個契約，
- * 差別只在字面長度上限（英文以詞計、中文以字計），那寫在 $comment 裡。
+ * minLength / maxLength 在兩種語言中都以 Unicode 字元計算；$comment 的篇幅目標不參與驗證。
  * 所以比對前先去掉語軌後綴。
  */
 export function checkSchemas(schemaDir = 'references/schemas', tplDir = 'assets/templates') {

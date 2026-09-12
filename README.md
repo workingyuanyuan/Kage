@@ -53,7 +53,7 @@ Two requirements:
 
 ## Usage
 
-Once it is installed, just say what you want in plain language. **You do not name the type** — say what the document is for and the agent picks. It asks only when two types genuinely both fit.
+Ask for Kage or a dark analog HTML layout and describe the document's purpose. The agent chooses a suitable template, language and length from your request, and asks when missing information materially affects the result.
 
 ```
 Turn these meeting notes into a one-pager for my manager
@@ -76,15 +76,15 @@ Common ways to ask:
 
 **Hand over whatever material you have.** Drafts, figures, brand logos, product screenshots — attach them or give paths.
 
-**It will not invent what it does not have.** When a logo, product shot or figure is missing, the agent comes back once with a short gap list, and leaves the gap marked on the page as `[需要資料：…]` — no stock mood imagery, no redrawn approximations of a logo, no made-up numbers.
+**Content follows your material.** Sections and case counts adapt to the available evidence. Necessary missing material is marked as `[需要資料：…]` in the working document, with a focused request when your input is needed.
 
-**What you get at handover**: the file path, which checks ran and what they said, every unfilled gap listed one by one, and a verdict on how the page looks at 1280 and 375.
+**What you get at handover**: links to the deliverables, a relevant validation summary, and any gaps or blockers that require action. The document presents the final content its readers need.
 
-**Say so if something looks off.** The agent names the element and its current value, then offers two options that are still within spec. If the same spot goes two rounds without landing, it stops nudging numbers and builds an A/B/C comparison for you to pick from.
+**Describe the result you want to improve.** The agent uses the content and visible layout to make appropriate changes. When a visual choice needs your preference, a focused question or comparison can help.
 
 ### What runs before it calls the job done
 
-The agent runs these itself; you do not need to remember them. They are listed so you know what "done" was checked against:
+Checks follow the work performed. Finished documents receive content and asset checks; new layouts normally receive desktop and mobile review. Background pixel checks apply to material changes, and the repository check applies to template, token or schema maintenance. Commands and their scope are documented in [production.md](references/production.md).
 
 ```bash
 node scripts/kage.mjs check                       # shared CSS block, colour tokens, template lint, content contracts
@@ -113,7 +113,7 @@ Long documents and decks also come out frame by frame (`shot <file.html> --frame
 
 **Typography leads with serif.** `display` 64 → `h1` 44 → `h2` 30 → body 16px. Headings and body both run serif; sans is reserved for navigation, dates and numbering. The typeface is a self-hosted Noto Serif TC under the OFL.
 
-**Content clears a contract first.** Each type has a JSON Schema fixing what must be present and how long it may run. A draft is validated before it reaches the template, so copy that would overflow the layout is stopped before it gets there.
+**Template capacity can be checked.** Each type has a JSON Schema describing its supplied structure and field limits. Use it when retaining that structure or validating a structured draft. Custom documents follow the requested content and are checked in their actual layout. String limits count Unicode characters.
 
 **The background layer has eight pixel checks.** Grain strength, luminance distribution, hue and column evenness are invisible in the source and unreliable to the eye. These eight run pixel statistics over a screenshot: centre darker than edge, three luminance-area bands, grain standard deviation, achromatic channels, low-frequency residual, hue distribution, body-column evenness, and cross-shot stability.
 

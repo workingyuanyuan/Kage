@@ -105,7 +105,7 @@ function cmdPlaceholders(paths) {
     } else {
       console.log(`${OK} ${r.file}`);
     }
-    // 缺口不算失敗 —— 但交付訊息裡必須逐條列出，所以這裡一定要印出來。
+    // 缺口不算工具失敗；列出標記供代理判斷其對交付的影響。
     if (r.gaps.length) {
       console.log(`      ${r.gaps.length} 個資料缺口待回報：`);
       for (const g of r.gaps) console.log(`         ${g}`);
