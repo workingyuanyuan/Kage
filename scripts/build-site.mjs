@@ -12,6 +12,10 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { extractBase } from './lib/sync.mjs';
 
 const REPO = 'https://github.com/workingyuanyuan/Kage';
+// 官網的公開網址。canonical、hreflang、og 與 sitemap 都以它為準 ——
+// 指向別處的 canonical 會讓搜尋引擎把那個網址當正本，跳過這裡。
+const SITE = 'https://workingyuanyuan.github.io/Kage/';
+const pageUrl = out => SITE + (out === 'index.html' ? '' : out);
 const TOKENS = JSON.parse(readFileSync('references/tokens.json', 'utf8'));
 const BASE = extractBase(readFileSync('assets/templates/one-pager.html', 'utf8').replace(/\r\n/g, '\n'))
   .replace(/\.\.\/img\//g, 'assets/img/');
@@ -240,6 +244,16 @@ const DEMOS = [
   ['landing-page', 'demo-aperture-site', '產品頁'],
 ];
 
+// 同一模式的中英兩頁互為翻譯，雙向宣告 hreflang；x-default 指向繁中頁。
+function langPair(out, lang, other) {
+  return lang === 'en' ? { zh: other.lang, en: out } : { zh: out, en: other.lang };
+}
+function alternates(out, lang, other) {
+  const { zh, en } = langPair(out, lang, other);
+  return [['zh-Hant', zh], ['en', en], ['x-default', zh]]
+    .map(([hl, p]) => `<link rel="alternate" hreflang="${hl}" href="${pageUrl(p)}">`).join('\n');
+}
+
 function build({ out, lang, mode, c, other }) {
   const en = lang === 'en';
   const suffix = en ? '-en' : '';
@@ -263,11 +277,13 @@ function build({ out, lang, mode, c, other }) {
 <meta name="description" content="${c['meta.desc']}">
 <meta name="author" content="workingyuanyuan">
 <meta name="generator" content="kage">
-<link rel="canonical" href="https://example.com/kage/${out}">
+<link rel="canonical" href="${pageUrl(out)}">
+${alternates(out, lang, other)}
 <meta property="og:type" content="website">
+<meta property="og:url" content="${pageUrl(out)}">
 <meta property="og:title" content="${c['meta.title']}">
 <meta property="og:description" content="${c['meta.desc']}">
-<meta property="og:image" content="assets/demos/${DEMOS[0][1]}${demoSuffix}-1280.png">
+<meta property="og:image" content="${SITE}assets/demos/${DEMOS[0][1]}${demoSuffix}-1280.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="assets/fonts/noto-serif-tc/noto-serif-tc.css">
 <style>
@@ -413,3 +429,23 @@ for (const [out, lang, mode, key, other] of PAGES) {
   const c = { ...COPY.shared, ...COPY[key] };
   build({ out, lang, mode, c, other });
 }
+
+// ── sitemap ───────────────────────────────────────────────────────
+// 只收官網四頁。assets/demos/ 的示範文件內容虛構，標了 noindex，不列入。
+// robots.txt 只在網域根目錄生效，由 workingyuanyuan.github.io 倉庫提供，這裡不放。
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${PAGES.map(([out, lang, , , other]) => {
+  const { zh, en } = langPair(out, lang, other);
+  return `  <url>
+    <loc>${pageUrl(out)}</loc>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="${pageUrl(zh)}"/>
+    <xhtml:link rel="alternate" hreflang="en" href="${pageUrl(en)}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${pageUrl(zh)}"/>
+  </url>`;
+}).join('\n')}
+</urlset>
+`;
+writeFileSync('sitemap.xml', sitemap);
+console.log('  sitemap.xml');
