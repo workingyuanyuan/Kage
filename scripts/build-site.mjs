@@ -14,7 +14,7 @@ import { extractBase } from './lib/sync.mjs';
 const REPO = 'https://github.com/workingyuanyuan/Kage';
 // 官網的公開網址。canonical、hreflang、og 與 sitemap 都以它為準 ——
 // 指向別處的 canonical 會讓搜尋引擎把那個網址當正本，跳過這裡。
-const SITE = 'https://workingyuanyuan.github.io/Kage/';
+const SITE = 'https://yuanaruru.com/Kage/';
 const pageUrl = out => SITE + (out === 'index.html' ? '' : out);
 const TOKENS = JSON.parse(readFileSync('references/tokens.json', 'utf8'));
 const BASE = extractBase(readFileSync('assets/templates/one-pager.html', 'utf8').replace(/\r\n/g, '\n'))

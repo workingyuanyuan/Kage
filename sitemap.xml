@@ -2,27 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://workingyuanyuan.github.io/Kage/</loc>
-    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://workingyuanyuan.github.io/Kage/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://workingyuanyuan.github.io/Kage/index-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://workingyuanyuan.github.io/Kage/"/>
+    <loc>https://yuanaruru.com/Kage/</loc>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://yuanaruru.com/Kage/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://yuanaruru.com/Kage/index-en.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yuanaruru.com/Kage/"/>
   </url>
   <url>
-    <loc>https://workingyuanyuan.github.io/Kage/index-develop.html</loc>
-    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://workingyuanyuan.github.io/Kage/index-develop.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://workingyuanyuan.github.io/Kage/index-en-develop.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://workingyuanyuan.github.io/Kage/index-develop.html"/>
+    <loc>https://yuanaruru.com/Kage/index-develop.html</loc>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://yuanaruru.com/Kage/index-develop.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://yuanaruru.com/Kage/index-en-develop.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yuanaruru.com/Kage/index-develop.html"/>
   </url>
   <url>
-    <loc>https://workingyuanyuan.github.io/Kage/index-en.html</loc>
-    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://workingyuanyuan.github.io/Kage/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://workingyuanyuan.github.io/Kage/index-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://workingyuanyuan.github.io/Kage/"/>
+    <loc>https://yuanaruru.com/Kage/index-en.html</loc>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://yuanaruru.com/Kage/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://yuanaruru.com/Kage/index-en.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yuanaruru.com/Kage/"/>
   </url>
   <url>
-    <loc>https://workingyuanyuan.github.io/Kage/index-en-develop.html</loc>
-    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://workingyuanyuan.github.io/Kage/index-develop.html"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://workingyuanyuan.github.io/Kage/index-en-develop.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://workingyuanyuan.github.io/Kage/index-develop.html"/>
+    <loc>https://yuanaruru.com/Kage/index-en-develop.html</loc>
+    <xhtml:link rel="alternate" hreflang="zh-Hant" href="https://yuanaruru.com/Kage/index-develop.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://yuanaruru.com/Kage/index-en-develop.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://yuanaruru.com/Kage/index-develop.html"/>
   </url>
 </urlset>
